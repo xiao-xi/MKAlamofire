@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Alamofire
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -16,6 +17,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        
+        //set up MKRequest
+        self.setupMKConfig()
         return true
     }
 
@@ -41,6 +45,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
 
-
+    func setupMKConfig() {
+        //这里根据scheme设置baseUrl
+        MKConfig.shared.baseURL = "http://test.monkey.cool/api/"
+////        MKConfig.shared.baseURL = "http://test.monkey.cool/api/"
+//        MKConfig.shared.cdnURL = ""
+        MKConfig.shared.acceptType = ["application/vnd.api+json", "application/json"]
+        MKConfig.shared.urlFilters = [UrlFilter()]
+////        MKConfig.shared.downFileName = ""
+//        MKConfig.shared.listenNetWork = true
+//        MKConfig.shared.allowsCellularAccess = true
+        //
+//        MKConfig.shared.serverPolicy = ServerTrustPolicyManager(policies: ["www.baidu,com": ServerTrustPolicy.performDefaultEvaluation(validateHost: true)])
+//        MKConfig.shared.sessionConfiguration
+//        MKConfig.shared.statusCode
+    }
 }
 

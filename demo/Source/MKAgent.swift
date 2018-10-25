@@ -8,9 +8,6 @@
 
 import Foundation
 import Alamofire
-#if os(iOS)
-    import UIKit
-#endif
 
 ///  MKAgent is the underlying class that handles actual request generation,
 ///  serialization and response handling.
@@ -38,10 +35,6 @@ public final class MKAgent {
 #if !os(watchOS)
     private let _listenManager: NetworkReachabilityManager?
 #endif
-#if os(iOS)
-    /// Add: load view
-    private let _loadView: MKActivityIndicatorView
-#endif
     
 // MARK: - Init and Reqest
     
@@ -58,18 +51,13 @@ public final class MKAgent {
         
         _manager = SessionManager(configuration: _config.sessionConfiguration, serverTrustPolicyManager: _config.serverPolicy)
         _lock = NSLock()
-        _asyncQueue = DispatchQueue.wbCurrent
+        _asyncQueue = DispatchQueue.mkCurrent
         _statusCode = _config.statusCode
         _contentType = _config.acceptType
         _requestRecord = [Int: MKBaseRequest]()
         
         #if !os(watchOS)
             _listenManager = NetworkReachabilityManager(host: "www.apple.com")
-        #endif
-        
-        #if os(iOS)
-            _loadView = MKActivityIndicatorView()
-            refreshLoadViewStatus()
         #endif
     }
     
@@ -274,34 +262,7 @@ public final class MKAgent {
             MKLog("Add Request: \(request)")
             self.addRecord(request)
             dataRequest.resume()
-            
-            #if os(iOS)
-                // if download file, not to show load view
-                if !request.resumableDownloadPath.isEmpty { return }
-                // update the loadView status
-                refreshLoadViewStatus()
-                // Whether show load view
-                if let view = MKUtils.wb_getCurrentViewController?.view, request.showLoadView {
-                    // set the load view's properties from the request settting.
-                    _loadView.setActivityLabel(text: request.showLoadText, font: request.showLoadTextFont, color: request.showLoadTextColor)
-                    if let type = request.showLoadAnimationType { _loadView.animationType = type }
-                    if let position = request.showLoadTextPosition { _loadView.labelPosition = position }
-                    // show the load view in main thread
-                    DispatchQueue.main.async {
-                        self._loadView.startAnimation(inView: view)
-                    }
-                }
-            #endif
         }
-    }
-    
-    /// Reset the loadView status only in iOS.
-    private func refreshLoadViewStatus() {
-        #if os(iOS)
-        _loadView.labelPosition = _config.loadViewTextPosition
-        _loadView.animationType = _config.loadViewAnimationType
-        _loadView.setActivityLabel(text: _config.loadViewText, font: _config.loadViewTextFont, color: _config.loadViewTextColor)
-        #endif
     }
     
     /// Show and hide the Network status.
@@ -731,11 +692,6 @@ public final class MKAgent {
             // remove request
             self.removeRecord(forRequest: request)
             request.clearCompleteClosure()
-            
-            #if os(iOS)
-                // stop load view
-                self._loadView.stopAnimation()
-            #endif
         }
     }
     
@@ -793,11 +749,6 @@ public final class MKAgent {
         DispatchQueue.main.async {
             self.removeRecord(forRequest: request)
             request.clearCompleteClosure()
-            
-            #if os(iOS)
-                // stop load view
-                self._loadView.stopAnimation()
-            #endif
         }
     }
 }

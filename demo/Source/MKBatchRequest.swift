@@ -206,7 +206,9 @@ extension MKBatchRequest {
 extension MKBatchRequest : MKRequestProtocol {
     
     public func requestFinish(_ request: MKBaseRequest) {
+//        request.delegate?.requestFinish(request)
         _finishCount += 1
+        
         if _finishCount == requests.count {
             self.totalAccessoriesWillStop()
             

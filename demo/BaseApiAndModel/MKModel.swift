@@ -10,7 +10,6 @@ import Foundation
 
 import ObjectMapper
 
-
 class MKModel: Mappable {
     
     required init?(map: Map) {
@@ -20,5 +19,4 @@ class MKModel: Mappable {
     func mapping(map: Map) {
         
     }
-
 }

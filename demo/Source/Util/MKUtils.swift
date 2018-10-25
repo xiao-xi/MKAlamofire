@@ -6,11 +6,7 @@
 //  Copyright © 2017年 HengSu Technology. All rights reserved.
 //
 
-#if os(iOS)
-    import UIKit
-#else
-    import Foundation
-#endif
+import Foundation
 
 public final class MKUtils {
 
@@ -90,31 +86,6 @@ public final class MKUtils {
         // We can only assume that the plist being successfully parsed means the resume data is valid.
         return true
     }
-    
-#if os(iOS)
-    /// Get the top current viewController.
-    public class var wb_getCurrentViewController: UIViewController? {
-        var result: UIViewController?
-        var window = UIApplication.shared.keyWindow
-        if window?.windowLevel != UIWindow.Level.normal {
-            let windows = UIApplication.shared.windows
-            for win in windows {
-                if win.windowLevel == UIWindow.Level.normal {
-                    window = win
-                    break
-                }
-            }
-        }
-        let forntView = window?.subviews.first
-        let responder = forntView?.next
-        if responder is UIViewController {
-            result = responder as? UIViewController
-        }else{
-            result = window?.rootViewController
-        }
-        return result
-    }
-#endif
 }
 
 /// NSKeyedArchiver metadata

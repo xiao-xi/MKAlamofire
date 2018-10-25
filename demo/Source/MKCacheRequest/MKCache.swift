@@ -30,7 +30,7 @@ public struct MKCache {
     /// - Parameter complete: calculate the download file size with closure
     public func downloadCacheSize(_ complete: @escaping CacheSizeCompleteClosure) {
 
-        DispatchQueue.wbCurrent.async {
+        DispatchQueue.mkCurrent.async {
 
             var path = NSSearchPathForDirectoriesInDomains(.cachesDirectory, .userDomainMask, true).first!
             path = (path as NSString).appendingPathComponent(MKConfig.shared.downFileName)
@@ -49,7 +49,7 @@ public struct MKCache {
     /// - Parameter complte: calculate the response cache file size with closure
     public func responseCacheFilesSize(_ complte: @escaping CacheSizeCompleteClosure) {
 
-        DispatchQueue.wbCurrent.async {
+        DispatchQueue.mkCurrent.async {
 
             var path = NSSearchPathForDirectoriesInDomains(.cachesDirectory, .userDomainMask, true).first!
             path = (path as NSString).appendingPathComponent(MKConfig.shared.cacheFileName)
@@ -227,7 +227,7 @@ public struct MKCache {
             }
             return
         }
-        DispatchQueue.wbCurrent.async {
+        DispatchQueue.mkCurrent.async {
             let filePaths = manager.subpaths(atPath: filePath)
             filePaths?.forEach {
                 let fileAbsoluePath = (filePath as NSString).appendingPathComponent($0)
@@ -254,7 +254,7 @@ public struct MKCache {
             complete(0)
             return
         }
-        DispatchQueue.wbCurrent.async {
+        DispatchQueue.mkCurrent.async {
             let filePaths = manager.subpaths(atPath: filePath)
             var size: Double = 0
             filePaths?.forEach {

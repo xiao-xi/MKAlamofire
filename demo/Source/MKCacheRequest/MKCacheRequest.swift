@@ -241,7 +241,7 @@ open class MKCacheRequest : MKBaseRequest {
         
         if self.writeCacheAsynchronously {
             // 自动异步缓存
-            DispatchQueue.wbCurrent.async {
+            DispatchQueue.mkCurrent.async {
                 self.saveResponseDataToCacheFile(super.responseData)
             }
         }else{

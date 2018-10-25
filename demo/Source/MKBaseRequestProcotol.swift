@@ -8,9 +8,6 @@
 
 import Foundation
 import Alamofire
-#if os(iOS)
-    import UIKit
-#endif
 
 /// the request priority
 /// 网络请求优先级别
@@ -306,51 +303,6 @@ public protocol MKBaseRequestProcotol {
     ///  Should use CDN when sending request.
     @available(iOS 8.0, watchOS 2.0, tvOS 9.0, OSX 10.10, *)
     var useCDN: Bool { get }
-
-// MARK: - iOS LoadView
-    
-///=============================================================================
-/// @name iOS LoadView
-///=============================================================================
-    
-#if os(iOS)
-    /// 是否显示loadView, Default is false
-    ///  Whether show the loadView. if you want use it, must be true.
-    ///  When it has used, will show a "Loading" HUD plug-in in the top ViewController's view.
-    ///  Default is false.
-    @available(iOS 8.0, *)
-    var showLoadView: Bool { get }
-    
-    /// 显示加载框的动画类型, 若不设置则使用MKConfig内的配置
-    /// According to the loading frame of animation types, if do not use the MKConfig
-    /// within the configuration Settings
-    @available(iOS 8.0, *)
-    var showLoadAnimationType: AnimationType? { get }
-    
-    /// 显示加载框文字的位置, 若不设置则使用MKConfig内的配置
-    /// Shows the location of the loading text box, if do not use the MKConfig
-    /// within the configuration Settings
-    @available(iOS 8.0, *)
-    var showLoadTextPosition: TextLabelPosition? { get }
-    
-    /// 显示加载框文字的颜色, 若不设置则使用MKConfig内的配置
-    /// The text box display color, if not use the MKConfig
-    /// within the configuration Settings
-    @available(iOS 8.0, *)
-    var showLoadTextColor: UIColor? { get }
-    
-    /// 显示加载框文字的字体, 若不设置则使用MKConfig内的配置
-    /// The box display text font, if do not use the MKConfig
-    /// within the configuration Settings
-    @available(iOS 8.0, *)
-    var showLoadTextFont: UIFont? { get }
-    
-    /// 显示加载框的文字, 若不设置则使用MKConfig内的配置
-    /// The text display loaded box, if don't use the MKConfig
-    /// within the configuration Settings
-    @available(iOS 8.0, *)
-    var showLoadText: String? { get }
-#endif
     
 ///=============================================================================
 /// @name  Response Information

@@ -8,9 +8,6 @@
 
 import Foundation
 import Alamofire
-#if os(iOS)
-    import UIKit
-#endif
 
 /// MKBaseRequest是实现BaseRequest的类，是完成基础的默认参数的设置，
 /// 在这里面实现所有的基本参数的重写
@@ -88,26 +85,6 @@ open class MKBaseRequest : MKBaseRequestProcotol {
     ///  Called on the main thread when request failed.
     @available(iOS 8.0, watchOS 2.0, tvOS 9.0, OSX 10.10, *)
     open func requestFailedFilter() -> Void {}
-
-// MARK: - iOS LoadView
-    
-///=============================================================================
-/// @name iOS LoadView
-///=============================================================================
-    
-#if os(iOS)
-    open var showLoadView: Bool { return false }
-    
-    open var showLoadAnimationType: AnimationType? { return nil }
-    
-    open var showLoadTextPosition: TextLabelPosition? { return nil }
-    
-    open var showLoadTextColor: UIColor? { return nil }
-    
-    open var showLoadTextFont: UIFont? { return nil }
-
-    open var showLoadText: String? { return nil }
-#endif
     
 // MARK: - Public Properties
     

@@ -8,16 +8,15 @@
 
 /* Begin PBXBuildFile section */
 		55C9AF9CF4CE581EE0B6BFE3 /* Pods_demo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50DA88963A5E55755117FB02 /* Pods_demo.framework */; };
-		6F07FCF621806D9B001B8DD6 /* BaseApiRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F07FCF521806D9B001B8DD6 /* BaseApiRequest.swift */; };
+		6F07FCF621806D9B001B8DD6 /* MKApiRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F07FCF521806D9B001B8DD6 /* MKApiRequest.swift */; };
 		6F07FD0821806F32001B8DD6 /* MKChainRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F07FCFA21806F32001B8DD6 /* MKChainRequest.swift */; };
 		6F07FD0921806F32001B8DD6 /* MKAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F07FCFB21806F32001B8DD6 /* MKAgent.swift */; };
 		6F07FD0A21806F32001B8DD6 /* MKBaseRequestProcotol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F07FCFC21806F32001B8DD6 /* MKBaseRequestProcotol.swift */; };
-		6F07FD0B21806F32001B8DD6 /* MKActivityIndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F07FCFD21806F32001B8DD6 /* MKActivityIndicatorView.swift */; };
 		6F07FD0D21806F32001B8DD6 /* MKBaseRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F07FD0121806F32001B8DD6 /* MKBaseRequest.swift */; };
 		6F07FD0E21806F32001B8DD6 /* MKUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F07FD0221806F32001B8DD6 /* MKUtils.swift */; };
 		6F07FD0F21806F32001B8DD6 /* MKBatchRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F07FD0321806F32001B8DD6 /* MKBatchRequest.swift */; };
 		6F07FD1021806F32001B8DD6 /* String+MD5.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F07FD0421806F32001B8DD6 /* String+MD5.swift */; };
-		6F07FD1121806F32001B8DD6 /* MKRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F07FD0521806F32001B8DD6 /* MKRequest.swift */; };
+		6F07FD1121806F32001B8DD6 /* MKCacheRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F07FD0521806F32001B8DD6 /* MKCacheRequest.swift */; };
 		6F07FD1221806F32001B8DD6 /* MKCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F07FD0621806F32001B8DD6 /* MKCache.swift */; };
 		6F07FD1321806F32001B8DD6 /* MKConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F07FD0721806F32001B8DD6 /* MKConfig.swift */; };
 		6F07FD15218080E9001B8DD6 /* MonkeyApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F07FD14218080E9001B8DD6 /* MonkeyApi.swift */; };
@@ -27,24 +26,25 @@
 		6F88129F217F0B6000B1A9F0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6F88129D217F0B6000B1A9F0 /* Main.storyboard */; };
 		6F8812A1217F0B6200B1A9F0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6F8812A0217F0B6200B1A9F0 /* Assets.xcassets */; };
 		6F8812A4217F0B6200B1A9F0 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6F8812A2217F0B6200B1A9F0 /* LaunchScreen.storyboard */; };
-		6F8812B0217F56A600B1A9F0 /* BaseModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F8812AF217F56A600B1A9F0 /* BaseModel.swift */; };
-		6F8812B2217F58B100B1A9F0 /* ParamModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F8812B1217F58B100B1A9F0 /* ParamModel.swift */; };
-		6F8812B4217F594000B1A9F0 /* ResponseModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F8812B3217F594000B1A9F0 /* ResponseModel.swift */; };
+		6F8812B0217F56A600B1A9F0 /* MKModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F8812AF217F56A600B1A9F0 /* MKModel.swift */; };
+		6FC8712C21819AAE0095C8C6 /* FriendModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FC8712B21819AAE0095C8C6 /* FriendModel.swift */; };
+		6FC8712E2181AEAA0095C8C6 /* MKErrorModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FC8712D2181AEAA0095C8C6 /* MKErrorModel.swift */; };
+		6FC871302181BA870095C8C6 /* UrlFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FC8712F2181BA870095C8C6 /* UrlFilter.swift */; };
+		6FC871332181BF3F0095C8C6 /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FC871322181BF3F0095C8C6 /* Environment.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		50DA88963A5E55755117FB02 /* Pods_demo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_demo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5F9256977369C9F98C071D40 /* Pods-demo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-demo.release.xcconfig"; path = "Pods/Target Support Files/Pods-demo/Pods-demo.release.xcconfig"; sourceTree = "<group>"; };
-		6F07FCF521806D9B001B8DD6 /* BaseApiRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseApiRequest.swift; sourceTree = "<group>"; };
+		6F07FCF521806D9B001B8DD6 /* MKApiRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MKApiRequest.swift; sourceTree = "<group>"; };
 		6F07FCFA21806F32001B8DD6 /* MKChainRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MKChainRequest.swift; sourceTree = "<group>"; };
 		6F07FCFB21806F32001B8DD6 /* MKAgent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MKAgent.swift; sourceTree = "<group>"; };
 		6F07FCFC21806F32001B8DD6 /* MKBaseRequestProcotol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MKBaseRequestProcotol.swift; sourceTree = "<group>"; };
-		6F07FCFD21806F32001B8DD6 /* MKActivityIndicatorView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MKActivityIndicatorView.swift; sourceTree = "<group>"; };
 		6F07FD0121806F32001B8DD6 /* MKBaseRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MKBaseRequest.swift; sourceTree = "<group>"; };
 		6F07FD0221806F32001B8DD6 /* MKUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MKUtils.swift; sourceTree = "<group>"; };
 		6F07FD0321806F32001B8DD6 /* MKBatchRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MKBatchRequest.swift; sourceTree = "<group>"; };
 		6F07FD0421806F32001B8DD6 /* String+MD5.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+MD5.swift"; sourceTree = "<group>"; };
-		6F07FD0521806F32001B8DD6 /* MKRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MKRequest.swift; sourceTree = "<group>"; };
+		6F07FD0521806F32001B8DD6 /* MKCacheRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MKCacheRequest.swift; sourceTree = "<group>"; };
 		6F07FD0621806F32001B8DD6 /* MKCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MKCache.swift; sourceTree = "<group>"; };
 		6F07FD0721806F32001B8DD6 /* MKConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MKConfig.swift; sourceTree = "<group>"; };
 		6F07FD14218080E9001B8DD6 /* MonkeyApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonkeyApi.swift; sourceTree = "<group>"; };
@@ -56,9 +56,11 @@
 		6F8812A0217F0B6200B1A9F0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6F8812A3217F0B6200B1A9F0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		6F8812A5217F0B6200B1A9F0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		6F8812AF217F56A600B1A9F0 /* BaseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseModel.swift; sourceTree = "<group>"; };
-		6F8812B1217F58B100B1A9F0 /* ParamModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParamModel.swift; sourceTree = "<group>"; };
-		6F8812B3217F594000B1A9F0 /* ResponseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResponseModel.swift; sourceTree = "<group>"; };
+		6F8812AF217F56A600B1A9F0 /* MKModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MKModel.swift; sourceTree = "<group>"; };
+		6FC8712B21819AAE0095C8C6 /* FriendModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendModel.swift; sourceTree = "<group>"; };
+		6FC8712D2181AEAA0095C8C6 /* MKErrorModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MKErrorModel.swift; sourceTree = "<group>"; };
+		6FC8712F2181BA870095C8C6 /* UrlFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UrlFilter.swift; sourceTree = "<group>"; };
+		6FC871322181BF3F0095C8C6 /* Environment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
 		AAF4155DBECDC60B3DC6EFDC /* Pods-demo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-demo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-demo/Pods-demo.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -85,17 +87,14 @@
 		6F07FCF921806F32001B8DD6 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				6F07FD0721806F32001B8DD6 /* MKConfig.swift */,
 				6F07FCFB21806F32001B8DD6 /* MKAgent.swift */,
 				6F07FCFC21806F32001B8DD6 /* MKBaseRequestProcotol.swift */,
-				6F07FCFA21806F32001B8DD6 /* MKChainRequest.swift */,
-				6F07FCFD21806F32001B8DD6 /* MKActivityIndicatorView.swift */,
 				6F07FD0121806F32001B8DD6 /* MKBaseRequest.swift */,
-				6F07FD0221806F32001B8DD6 /* MKUtils.swift */,
+				6F07FCFA21806F32001B8DD6 /* MKChainRequest.swift */,
 				6F07FD0321806F32001B8DD6 /* MKBatchRequest.swift */,
-				6F07FD0421806F32001B8DD6 /* String+MD5.swift */,
-				6F07FD0521806F32001B8DD6 /* MKRequest.swift */,
-				6F07FD0621806F32001B8DD6 /* MKCache.swift */,
-				6F07FD0721806F32001B8DD6 /* MKConfig.swift */,
+				6FC8712A2181987A0095C8C6 /* Util */,
+				6FC87129218198380095C8C6 /* MKCacheRequest */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -121,6 +120,7 @@
 		6F881298217F0B6000B1A9F0 /* demo */ = {
 			isa = PBXGroup;
 			children = (
+				6FC871312181BC780095C8C6 /* UrlFilter */,
 				6F07FCF921806F32001B8DD6 /* Source */,
 				6FC871282181909A0095C8C6 /* MonkeyModel */,
 				6FC87127218190890095C8C6 /* MonkeyApi */,
@@ -138,9 +138,10 @@
 		6FC87126218190790095C8C6 /* BaseApiAndModel */ = {
 			isa = PBXGroup;
 			children = (
-				6F8812AF217F56A600B1A9F0 /* BaseModel.swift */,
-				6F8812B3217F594000B1A9F0 /* ResponseModel.swift */,
-				6F07FCF521806D9B001B8DD6 /* BaseApiRequest.swift */,
+				6F8812AF217F56A600B1A9F0 /* MKModel.swift */,
+				6FC8712D2181AEAA0095C8C6 /* MKErrorModel.swift */,
+				6F07FCF521806D9B001B8DD6 /* MKApiRequest.swift */,
+				6FC871322181BF3F0095C8C6 /* Environment.swift */,
 			);
 			path = BaseApiAndModel;
 			sourceTree = "<group>";
@@ -156,10 +157,36 @@
 		6FC871282181909A0095C8C6 /* MonkeyModel */ = {
 			isa = PBXGroup;
 			children = (
-				6F8812B1217F58B100B1A9F0 /* ParamModel.swift */,
 				6F07FD162180A0E7001B8DD6 /* UserModel.swift */,
+				6FC8712B21819AAE0095C8C6 /* FriendModel.swift */,
 			);
 			path = MonkeyModel;
+			sourceTree = "<group>";
+		};
+		6FC87129218198380095C8C6 /* MKCacheRequest */ = {
+			isa = PBXGroup;
+			children = (
+				6F07FD0521806F32001B8DD6 /* MKCacheRequest.swift */,
+				6F07FD0621806F32001B8DD6 /* MKCache.swift */,
+			);
+			path = MKCacheRequest;
+			sourceTree = "<group>";
+		};
+		6FC8712A2181987A0095C8C6 /* Util */ = {
+			isa = PBXGroup;
+			children = (
+				6F07FD0421806F32001B8DD6 /* String+MD5.swift */,
+				6F07FD0221806F32001B8DD6 /* MKUtils.swift */,
+			);
+			path = Util;
+			sourceTree = "<group>";
+		};
+		6FC871312181BC780095C8C6 /* UrlFilter */ = {
+			isa = PBXGroup;
+			children = (
+				6FC8712F2181BA870095C8C6 /* UrlFilter.swift */,
+			);
+			path = UrlFilter;
 			sourceTree = "<group>";
 		};
 		AA427B9C7F653595390CACF6 /* Pods */ = {
@@ -305,20 +332,21 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6F8812B2217F58B100B1A9F0 /* ParamModel.swift in Sources */,
 				6F07FD0F21806F32001B8DD6 /* MKBatchRequest.swift in Sources */,
 				6F07FD0E21806F32001B8DD6 /* MKUtils.swift in Sources */,
 				6F07FD1021806F32001B8DD6 /* String+MD5.swift in Sources */,
 				6F07FD0921806F32001B8DD6 /* MKAgent.swift in Sources */,
-				6F07FD1121806F32001B8DD6 /* MKRequest.swift in Sources */,
+				6F07FD1121806F32001B8DD6 /* MKCacheRequest.swift in Sources */,
 				6F88129C217F0B6000B1A9F0 /* ViewController.swift in Sources */,
 				6F07FD172180A0E7001B8DD6 /* UserModel.swift in Sources */,
-				6F07FCF621806D9B001B8DD6 /* BaseApiRequest.swift in Sources */,
-				6F07FD0B21806F32001B8DD6 /* MKActivityIndicatorView.swift in Sources */,
-				6F8812B0217F56A600B1A9F0 /* BaseModel.swift in Sources */,
-				6F8812B4217F594000B1A9F0 /* ResponseModel.swift in Sources */,
+				6F07FCF621806D9B001B8DD6 /* MKApiRequest.swift in Sources */,
+				6F8812B0217F56A600B1A9F0 /* MKModel.swift in Sources */,
+				6FC871332181BF3F0095C8C6 /* Environment.swift in Sources */,
+				6FC8712E2181AEAA0095C8C6 /* MKErrorModel.swift in Sources */,
 				6F07FD0821806F32001B8DD6 /* MKChainRequest.swift in Sources */,
 				6F88129A217F0B6000B1A9F0 /* AppDelegate.swift in Sources */,
+				6FC8712C21819AAE0095C8C6 /* FriendModel.swift in Sources */,
+				6FC871302181BA870095C8C6 /* UrlFilter.swift in Sources */,
 				6F07FD0D21806F32001B8DD6 /* MKBaseRequest.swift in Sources */,
 				6F07FD1221806F32001B8DD6 /* MKCache.swift in Sources */,
 				6F07FD1321806F32001B8DD6 /* MKConfig.swift in Sources */,

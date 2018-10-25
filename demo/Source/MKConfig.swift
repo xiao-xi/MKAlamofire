@@ -8,9 +8,6 @@
 
 import Foundation
 import Alamofire
-#if os(iOS)
-    import UIKit
-#endif
 
 ///  MKURLFilterProtocol can be used to append common parameters to requests before sending them.
 public protocol MKURLFilterProtocol {
@@ -101,34 +98,6 @@ public final class MKConfig {
     /// 下载文件时保存的文件名, 位于`/Library/Caches/{downFileName}`下
     /// Download file name
     public var downFileName = "MKAgent.download.default"
-   
-// MARK: - Only iOS LoadView
-    
-///=============================================================================
-/// @name Only iOS LoadView
-///=============================================================================
-    
-#if os(iOS)
-    /// 加载框的动画类型，默认为native
-    /// The load view animationType. Default is native.
-    public var loadViewAnimationType = AnimationType.native
-    
-    /// 加载框的文字位置，默认为bottom
-    /// The load view text position. Default is bottom.
-    public var loadViewTextPosition = TextLabelPosition.bottom
-    
-    /// 加载框的文字颜色，默认为白色
-    /// The load view textColor. Default is white.
-    public var loadViewTextColor = UIColor.white
-    
-    /// 加载框的文字大小，默认为15.
-    /// The load view text font. Default is 15.
-    public var loadViewTextFont = UIFont.systemFont(ofSize: 15)
-    
-    /// 加载框显示的文字，默认为Loading
-    /// The load view text. Default is 'Loading'.
-    public var loadViewText = "Loading"
-#endif
     
 // MARK: - Cycle Life
     
@@ -224,7 +193,7 @@ extension MKConfig : CustomDebugStringConvertible {
 ///=============================================================================
 
 extension DispatchQueue {
-    public static var wbCurrent: DispatchQueue {
+    public static var mkCurrent: DispatchQueue {
         let name = String(format: "com.MKAgent.request.%08x%08x", arc4random(),arc4random())
         return DispatchQueue(label: name, attributes: .concurrent)
     }
