@@ -33,7 +33,11 @@ class MKApiRequest: MKBaseRequest {
     
     var netParams: [String: Any]?
     
-    var dataKey: String{
+//    var dataKey: String?{
+//        return "data"
+//    }
+    
+    func dataKey() -> String? {
         return "data"
     }
     
@@ -70,6 +74,7 @@ class MKApiRequest: MKBaseRequest {
         return headerDic
     }
     
+    //进行会返回模型对象的网络请求
     public func startWithJSONResponse<T: MKModel>(_ responseType:T.Type, success successHandler:@escaping successJSONCompletionHandler<T>, failed failedHandler: @escaping failedCompletionHandler) -> Void{
         self.startWithCompletion(.JSON, success: { (jsonModel, jsonArray) in
             successHandler(self, jsonModel)
@@ -78,6 +83,7 @@ class MKApiRequest: MKBaseRequest {
         }
     }
     
+    //进行会返回模型对象数组的网络请求
     public func startWithJSONArrayResponse<T: MKModel>(_ responseType:T.Type, success successHandler:@escaping successArrayCompletionHandler<T>, failed failedHandler: @escaping failedCompletionHandler) -> Void{
         self.startWithCompletion(.JSONArray, success: { (jsonModel, jsonArray) in
             successHandler(self, jsonArray)
@@ -86,6 +92,7 @@ class MKApiRequest: MKBaseRequest {
         }
     }
     
+    //根据参数类型返回数据模型或模型数组
     public func startWithCompletion<T: MKModel>(_ responseType: DataType,success successHandler:@escaping successCompletionHandler<T>, failed failedHandler: @escaping failedModelCompletionHandler) -> Void{
         self.start({ (request) in
             
@@ -132,8 +139,9 @@ class MKApiRequest: MKBaseRequest {
     
     //通过self.dataKey ，request.responseJson 获取json数据并返回
     private func getJSONData(_ request: MKBaseRequest) -> [String: Any]?{
-        
-//        return request.responseJson![self.dataKey] as? [String : Any]
+        if let key = self.dataKey(){
+            return request.responseJson![key] as? [String : Any]
+        }
         return request.responseJson
     }
     

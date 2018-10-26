@@ -94,6 +94,10 @@ class RefreshApi: MKApiRequest {
     override var paramEncoding: MKParameterEncoding{
         return MKParameterEncoding.json
     }
+    
+    override func dataKey() -> String? {
+        return nil
+    }
 }
 
 
