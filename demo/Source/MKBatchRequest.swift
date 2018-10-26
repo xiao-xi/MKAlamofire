@@ -34,6 +34,10 @@ public final class MKBatchRequest {
     ///  this array will be automatically created. Default is nil.
     public private(set) var requestAccessories: [MKRequestAccessoryProtocol]?
     
+    public var failedCount:Int = 0
+    
+    public var failedRequests: [MKBaseRequest]
+    
     /// 如果请求失败, 此为失败的请求
     ///  The first request that failed (and causing the batch request to fail).
     public private(set) var failedRequest: MKBaseRequest?
@@ -42,15 +46,25 @@ public final class MKBatchRequest {
     ///  Tag can be used to identify batch request. Default value is 0.
     public var tag: Int
     
-    /// 请求成功回调
+    /// 请求结束回调，无论是否存在失败的请求
+    ///  The success callback. Note this will be called only if all the requests are finished.
+    ///  This block will be called on the main queue.
+    public var finishCompleteClosure: MKBatchRequestClosure?
+    
+    /// 请求成功回调，全部成功
     ///  The success callback. Note this will be called only if all the requests are finished.
     ///  This block will be called on the main queue.
     public var successCompleteClosure: MKBatchRequestClosure?
     
-    /// 请求失败回调
+    /// 请求失败回调，存在失败的请求
     ///  The failure callback. Note this will be called if one of the requests fails.
     ///  This block will be called on the main queue.
     public var failureCompleteClosure: MKBatchRequestClosure?
+    
+    //单个接口的回调
+    public var singleRequestFinish: MKBaseRequestProcotol.MKRequestCompleteClosure?
+    //单个接口的回调失败回调
+    public var singleRequestFailed: MKBaseRequestProcotol.MKRequestCompleteClosure?
     
     /// 数据源是否全部来自于缓存
     ///  Whether all response data is from local cache.
@@ -85,6 +99,7 @@ public final class MKBatchRequest {
         _finishCount = 0
         tag = 0
         rawString = UUID().uuidString
+        failedRequests = []
     }
     
 // MARK: - Start Action
@@ -100,6 +115,7 @@ public final class MKBatchRequest {
             return
         }
         self.failedRequest = nil
+        self.failedRequests = []
         MKBatchAlamofire.shared.add(self)
         self.totalAccessoriesWillStart()
         requests.forEach {
@@ -121,9 +137,20 @@ public final class MKBatchRequest {
     
     ///  Convenience method to start the batch request with block callbacks.
     public func start(_ success: MKBatchRequestClosure?, failure failureClosure: MKBatchRequestClosure?) {
-        self.successCompleteClosure = success
-        self.failureCompleteClosure = failureClosure
-        
+        self.start(success, failure: failureClosure, singleSuccess: nil, singleFailure: nil)
+    }
+    
+    ///  Convenience method to start the batch request with block callbacks when only finsh adn single request with block callbacks.
+    public func start(finish finishClosure: MKBatchRequestClosure?,singleSuccess singleSuccessClosure: MKBaseRequestProcotol.MKRequestCompleteClosure?, singleFailure singleFailureClosure: MKBaseRequestProcotol.MKRequestCompleteClosure?){
+        self.set(finishClosure)
+        self.setSingleCompletion(singleSuccessClosure, failure: singleFailureClosure)
+        self.start()
+    }
+    
+    ///  Convenience method to start the batch request with block callbacks adn single request with block callbacks.
+    public func start(_ success: MKBatchRequestClosure?, failure failureClosure: MKBatchRequestClosure?,singleSuccess singleSuccessClosure: MKBaseRequestProcotol.MKRequestCompleteClosure?, singleFailure singleFailureClosure: MKBaseRequestProcotol.MKRequestCompleteClosure?) {
+        self.set(success, failure: failureClosure)
+        self.setSingleCompletion(singleSuccessClosure, failure: singleFailureClosure)
         self.start()
     }
     
@@ -135,17 +162,29 @@ public final class MKBatchRequest {
         requestAccessories?.append(requestAccessory)
     }
     
-    ///  Set completion callbacks
+    public func set(_ finish: MKBatchRequestClosure?){
+        self.finishCompleteClosure = finish
+    }
+    
+    ///  Set batchRequest completion callbacks
     public func set(_ success: MKBatchRequestClosure?, failure failureClosure: MKBatchRequestClosure?) {
         self.successCompleteClosure = success
         self.failureCompleteClosure = failureClosure
+    }
+    ///  Set requests completion callbacks
+    public func setSingleCompletion(_ singleSuccessClosure: MKBaseRequestProcotol.MKRequestCompleteClosure?, failure singleFailureClosure: MKBaseRequestProcotol.MKRequestCompleteClosure?){
+        self.singleRequestFinish = singleSuccessClosure
+        self.singleRequestFailed = singleFailureClosure
     }
     
     ///  Nil out both success and failure callback blocks.
     public func cleanCompleteClosre() -> Void {
         // nil out to break the retain cycle.
+        self.finishCompleteClosure = nil
         self.successCompleteClosure = nil
         self.failureCompleteClosure = nil
+        self.singleRequestFinish = nil
+        self.singleRequestFailed = nil
     }
     
 // MARK: - Private
@@ -206,18 +245,23 @@ extension MKBatchRequest {
 extension MKBatchRequest : MKRequestProtocol {
     
     public func requestFinish(_ request: MKBaseRequest) {
-//        request.delegate?.requestFinish(request)
+        self.singleRequestFinish?(request)
         _finishCount += 1
-        
         if _finishCount == requests.count {
             self.totalAccessoriesWillStop()
             
             if let delegate = delegate {
+                delegate.batchRequestDidSuccess(self)
                 delegate.batchRequestDidFinished(self)
             }
             if let closure = successCompleteClosure {
                 closure(self)
             }
+            
+            if let closure = finishCompleteClosure {
+                closure(self)
+            }
+            
             self.cleanCompleteClosre()
             
             self.totalAccessoriesDidStop()
@@ -226,23 +270,36 @@ extension MKBatchRequest : MKRequestProtocol {
     }
     
     public func requestFailed(_ request: MKBaseRequest) {
-        self.failedRequest = request
-        self.totalAccessoriesWillStop()
-        // stop
-        requests.forEach { $0.stop() }
+        self.singleRequestFailed?(request)
         
-        // call back
-        if let delegate = delegate {
-            delegate.batchRequestDidFailed(self)
+        failedCount += 1    //失败次数+1
+        _finishCount += 1   //无论成功或者失败都属于完成
+        failedRequests.append(request)
+        if _finishCount == requests.count { //所有的请求都已经完成时结束
+            self.failedRequest = request    //这里存储的是最后一个request
+            self.totalAccessoriesWillStop()
+            
+            // call back
+            if let delegate = delegate {
+                delegate.batchRequestDidFailed(self)
+                delegate.batchRequestDidFinished(self)
+            }
+            
+            if let closure = failureCompleteClosure {
+                closure(self)
+            }
+            
+            if let closure = finishCompleteClosure {
+                closure(self)
+            }
+            
+            // clean
+            self.cleanCompleteClosre()
+            
+            self.totalAccessoriesDidStop()
+            MKBatchAlamofire.shared.remove(self)
         }
-        if let closure = failureCompleteClosure {
-            closure(self)
-        }
-        // clean
-        self.cleanCompleteClosre()
         
-        self.totalAccessoriesDidStop()
-        MKBatchAlamofire.shared.remove(self)
     }
 }
 
@@ -260,13 +317,18 @@ extension MKBatchRequest : MKRequestProtocol {
 public protocol MKBatchRequestProtocol : class {
     
     ///  Tell the delegate that the batch request has finished successfully/
-    /// 并式请求响应成功
+    /// 并式请求全部结束
     ///
     ///  @param batchRequest The corresponding batch request.
     func batchRequestDidFinished(_ batchRequest: MKBatchRequest) -> Void
     
+    /// 并式请求全部成功
+    ///
+    ///  @param batchRequest The corresponding batch request
+    func batchRequestDidSuccess(_ batchRequest: MKBatchRequest) -> Void
+    
     ///  Tell the delegate that the batch request has failed.
-    /// 并式请求响应失败
+    /// 并式请求全部请求中存在失败的请求
     ///
     ///  @param batchRequest The corresponding batch request.
     func batchRequestDidFailed(_ batchRequest: MKBatchRequest) -> Void

@@ -23,6 +23,12 @@ class MKApiRequest: MKBaseRequest {
         return false
     }
     
+    var netParams: [String: Any]?
+    
+    override var requestParams: [String : Any]?{
+        return self.netParams
+    }
+    
     //默认设置请求方式为get
     override var requestMethod: MKHTTPMethod{
         return MKHTTPMethod.get
@@ -58,7 +64,9 @@ class MKApiRequest: MKBaseRequest {
         - finishSuccessHandler: block success
         - finishFailedHandler: block failed
      */
-    func getJsonDataWithCompletionHandler<T: Mappable>(_ responseClass:T.Type,success finishSuccessHandler:@escaping completeJSONHandler<T>, failed finishFailedHandler:@escaping completeFailedHandler) -> Void{
+    typealias ModelSS = Mappable
+//    <C1:Container,C2:Container where C1.itemType == C2.itemType,C1.itemType:Equatable>
+    func getJsonDataWithCompletionHandler<T: ModelSS>(_ responseClass:T.Type,success finishSuccessHandler:@escaping completeJSONHandler<T>, failed finishFailedHandler:@escaping completeFailedHandler) -> Void {
         //start request with proprety of self
         self.start({ (successRequest) in
             
@@ -67,11 +75,20 @@ class MKApiRequest: MKBaseRequest {
             }
     
             if let data = successRequest.responseJson {
-                let resJson = Mapper<T>().map(JSON: data["data"] as! [String : Any])
-                if self.needRealm{
-                    self.writeRealm(resJson)
-                }
+                //
+//                MKAgent.shared.cancel(<#T##request: MKBaseRequest##MKBaseRequest#>)
+//                MKAgent.shared.cancelAllRequest()
+//                var isRefreshToken: Bool = false
+//                guard
+//                if data["error_code"] ==
+                //Refresh
                 
+                let resJson = Mapper<T>().map(JSON: data["data"] as! [String : Any])
+                
+                if self.needRealm{
+                    self.writeRealm(resJson!)
+                }
+//                self.statusCode
                 finishSuccessHandler(self, resJson)
             }
         }) { (failedRequest) in
@@ -96,6 +113,7 @@ class MKApiRequest: MKBaseRequest {
             //再使用Mapper<T>().mapArray(JSONfile: jsonString)方法转化为数组
             //最后进行回调
             let resJsonArray = Mapper<T>().mapArray(JSONString: "")
+            
             finishSuccessHandler(self, resJsonArray)
         }) { (baseRequest) in
             finishFailedHandler(self, nil)
@@ -104,14 +122,15 @@ class MKApiRequest: MKBaseRequest {
     
     /// 写入realm数据库(write to realm db)
     ///
-    /// - Parameter model: 需要写入的数据模型(the model of data)
-    /// - Returns: 写入结果(result)
-    private func writeRealm<T:Mappable>(_ model:T?) -> Void {
+    /// - Parameter model: 需要写入的数据模型
+    private func writeRealm<T:ModelSS>(_ model:T) -> Void {
         // Get the default Realm
         let realm = try! Realm()
+        
         // Persist your data easily
         try! realm.write {
-//            realm.add(model as! Object)
+//            realm.add(model!)
         }
+        
     }
 }

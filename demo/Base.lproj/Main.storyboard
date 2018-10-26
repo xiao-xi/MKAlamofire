@@ -18,18 +18,76 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gSc-ra-MvV">
-                                <rect key="frame" x="161" y="145" width="53" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="request"/>
-                            </button>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="43" translatesAutoresizingMaskIntoConstraints="NO" id="npE-Zx-YfV">
+                                <rect key="frame" x="20" y="84" width="335" height="513"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gSc-ra-MvV">
+                                        <rect key="frame" x="119" y="0.0" width="97" height="30"/>
+                                        <state key="normal" title="singleRequest"/>
+                                        <connections>
+                                            <action selector="singleRequest:" destination="BYZ-38-t0r" eventType="touchUpInside" id="eoZ-Uf-lai"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="S0m-2W-TiK">
+                                        <rect key="frame" x="119.5" y="73" width="96" height="30"/>
+                                        <state key="normal" title="batchRequest"/>
+                                        <connections>
+                                            <action selector="batchRequest:" destination="BYZ-38-t0r" eventType="touchUpInside" id="M3m-Ez-7Vg"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tN0-9m-7mp">
+                                        <rect key="frame" x="120.5" y="146" width="94" height="30"/>
+                                        <state key="normal" title="chainRequest"/>
+                                        <connections>
+                                            <action selector="chainRequest:" destination="BYZ-38-t0r" eventType="touchUpInside" id="YKx-d7-Ep6"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8N7-M3-1l5">
+                                        <rect key="frame" x="126.5" y="219" width="82" height="30"/>
+                                        <state key="normal" title="relyRequest"/>
+                                        <connections>
+                                            <action selector="chainAndBatchRequest:" destination="BYZ-38-t0r" eventType="touchUpInside" id="0rc-sq-csc"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xsk-4Q-7Bt">
+                                        <rect key="frame" x="126" y="292" width="83" height="30"/>
+                                        <state key="normal" title="testRequest"/>
+                                        <connections>
+                                            <action selector="testRequest:" destination="BYZ-38-t0r" eventType="touchUpInside" id="rbQ-FE-9PC"/>
+                                        </connections>
+                                    </button>
+                                    <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" text="text log" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="iWc-N5-kcW">
+                                        <rect key="frame" x="10" y="365" width="315" height="148"/>
+                                        <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <color key="textColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                    </textView>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="iWc-N5-kcW" firstAttribute="leading" secondItem="npE-Zx-YfV" secondAttribute="leading" constant="10" id="3oD-HI-hpy"/>
+                                    <constraint firstAttribute="trailing" secondItem="iWc-N5-kcW" secondAttribute="trailing" constant="10" id="Fn3-vw-204"/>
+                                    <constraint firstAttribute="bottom" secondItem="iWc-N5-kcW" secondAttribute="bottom" id="NGu-3P-XXF"/>
+                                </constraints>
+                            </stackView>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="npE-Zx-YfV" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="64" id="RNp-Io-ZZz"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="npE-Zx-YfV" secondAttribute="trailing" constant="20" id="Smy-GE-osR"/>
+                            <constraint firstItem="npE-Zx-YfV" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="cTk-7f-AuC"/>
+                            <constraint firstItem="npE-Zx-YfV" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="geO-45-kkB"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="npE-Zx-YfV" secondAttribute="bottom" constant="70" id="jhx-1i-aCL"/>
+                        </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
+                    <connections>
+                        <outlet property="logTextView" destination="iWc-N5-kcW" id="OaF-ad-j43"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="53.600000000000001" y="26.53673163418291"/>
         </scene>
     </scenes>
 </document>

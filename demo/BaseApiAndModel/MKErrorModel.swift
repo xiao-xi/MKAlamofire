@@ -8,17 +8,7 @@
 
 import Foundation
 import ObjectMapper
-//public enum HTTPMethod: String {
-//    case options = "OPTIONS"
-//    case get     = "GET"
-//    case head    = "HEAD"
-//    case post    = "POST"
-//    case put     = "PUT"
-//    case patch   = "PATCH"
-//    case delete  = "DELETE"
-//    case trace   = "TRACE"
-//    case connect = "CONNECT"
-//}
+
 enum MKErrorStatus : String{
     case Status_FORBIDDEN = "FORBIDDEN"
 }

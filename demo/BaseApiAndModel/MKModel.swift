@@ -19,4 +19,6 @@ class MKModel: Mappable {
     func mapping(map: Map) {
         
     }
+    
+    
 }
