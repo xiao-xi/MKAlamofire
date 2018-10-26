@@ -216,6 +216,10 @@ open class MKBaseRequest : MKBaseRequestProcotol {
         self.failureCompleteClosure = failureClosure
     }
     
+    open func set(_ downloadProgress: @escaping Request.ProgressHandler){
+        self.downloadProgress = downloadProgress
+    }
+    
     ///  Convenience method to add request accessory. See also `requestAccessories`.
     open func add(_ requestAccessory: MKRequestAccessoryProtocol) {
         if requestAccessories == nil {

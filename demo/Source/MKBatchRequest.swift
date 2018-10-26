@@ -34,13 +34,17 @@ public final class MKBatchRequest {
     ///  this array will be automatically created. Default is nil.
     public private(set) var requestAccessories: [MKRequestAccessoryProtocol]?
     
+    //所有请求成功的数量
+    public var successCount: Int = 0
+    
+    //所有成功的数组
+    public var successRequests: [MKBaseRequest]
+    
+    //所有请求失败的数量
     public var failedCount:Int = 0
     
+    //请求失败的数组
     public var failedRequests: [MKBaseRequest]
-    
-    /// 如果请求失败, 此为失败的请求
-    ///  The first request that failed (and causing the batch request to fail).
-    public private(set) var failedRequest: MKBaseRequest?
     
     ///  batch request identify. Default 0.
     ///  Tag can be used to identify batch request. Default value is 0.
@@ -66,16 +70,6 @@ public final class MKBatchRequest {
     //单个接口的回调失败回调
     public var singleRequestFailed: MKBaseRequestProcotol.MKRequestCompleteClosure?
     
-    /// 数据源是否全部来自于缓存
-    ///  Whether all response data is from local cache.
-//    public var isDataFromCache: Bool {
-//        var dataCache = true
-//        requests.forEach {
-//            if !$0.isDataFromCache { dataCache = false }
-//        }
-//        return dataCache
-//    }
-    
 // MARK: - Private Properties
     
 ///=============================================================================
@@ -99,6 +93,7 @@ public final class MKBatchRequest {
         _finishCount = 0
         tag = 0
         rawString = UUID().uuidString
+        successRequests = []
         failedRequests = []
     }
     
@@ -114,7 +109,7 @@ public final class MKBatchRequest {
             MKLog("Batch Error! batch request has already started.")
             return
         }
-        self.failedRequest = nil
+        self.successRequests = []
         self.failedRequests = []
         MKBatchAlamofire.shared.add(self)
         self.totalAccessoriesWillStart()
@@ -246,7 +241,9 @@ extension MKBatchRequest : MKRequestProtocol {
     
     public func requestFinish(_ request: MKBaseRequest) {
         self.singleRequestFinish?(request)
+        successCount += 1
         _finishCount += 1
+        successRequests.append(request)
         if _finishCount == requests.count {
             self.totalAccessoriesWillStop()
             
@@ -276,7 +273,6 @@ extension MKBatchRequest : MKRequestProtocol {
         _finishCount += 1   //无论成功或者失败都属于完成
         failedRequests.append(request)
         if _finishCount == requests.count { //所有的请求都已经完成时结束
-            self.failedRequest = request    //这里存储的是最后一个request
             self.totalAccessoriesWillStop()
             
             // call back

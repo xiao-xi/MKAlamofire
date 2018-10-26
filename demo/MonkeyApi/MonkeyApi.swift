@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Alamofire
 
 class RegisterApi: MKApiRequest {
     var phoneNum: String!

@@ -12,13 +12,17 @@ import ObjectMapper
 
 class MKModel: Mappable {
     
-    required init?(map: Map) {
+    required convenience init?(map: Map) {
+        self.init()
+    }
+    
+    required init() {
         
     }
     
     func mapping(map: Map) {
         
     }
-    
-    
 }
+
+

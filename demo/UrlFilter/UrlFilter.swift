@@ -10,7 +10,7 @@ import Foundation
 
 class UrlFilter: MKURLFilterProtocol {
     func filterURL(_ originURL: String, baseRequest request: MKBaseRequest) -> String {
-        print("origin url: \(originURL),requestUrl:\(request.requestURL), param: \(String(describing: request.requestParams))")
+//        print("origin url: \(originURL),requestUrl:\(request.requestURL), param: \(String(describing: request.requestParams))")
         return originURL
     }
 }

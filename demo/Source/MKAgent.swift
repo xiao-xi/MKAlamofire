@@ -9,6 +9,7 @@
 import Foundation
 import Alamofire
 
+
 ///  MKAgent is the underlying class that handles actual request generation,
 ///  serialization and response handling.
 public final class MKAgent {
@@ -36,6 +37,38 @@ public final class MKAgent {
     private let _listenManager: NetworkReachabilityManager?
 #endif
     
+    // MARK: - wait
+    private var isWaiting: Bool = false
+    private var _waitingRequests:[MKBaseRequest]
+    private var _waitingTag: Int = 0
+    
+    public func wait(for request:MKBaseRequest, Tag tag:Int){
+        self.isWaiting = true
+        _waitingTag = tag
+        request.tag = tag
+    }
+    
+    private func addWaitingRequest(_ request:MKBaseRequest){
+        _waitingRequests.append(request)
+    }
+    
+    public func resumWaitRequests(){
+        self.isWaiting = false
+        _waitingTag = 0
+        _waitingRequests.forEach { (request) in
+            self.add(request)
+        }
+        _waitingRequests.removeAll()
+    }
+    
+    public func cancelAllWaitRequest() {
+        //因为被拦截的request并没有被添加到record中，所以不需要cancel这些request
+        self.isWaiting = false
+        _waitingTag = 0
+        _waitingRequests.removeAll()
+    }
+    
+    
 // MARK: - Init and Reqest
     
 ///=============================================================================
@@ -56,6 +89,8 @@ public final class MKAgent {
         _contentType = _config.acceptType
         _requestRecord = [Int: MKBaseRequest]()
         
+        _waitingRequests = []
+        
         #if !os(watchOS)
             _listenManager = NetworkReachabilityManager(host: "www.apple.com")
         #endif
@@ -66,7 +101,11 @@ public final class MKAgent {
     ///
     /// - Parameter request: Class from MKBaseRequest
     public func add(_ request: MKBaseRequest) -> Void {
-        
+        if request.tag != _waitingTag && self.isWaiting{
+            //
+            self.addWaitingRequest(request)
+            return
+        }
         #if !os(watchOS)
             if let listenManager = _listenManager, !listenManager.isReachable {
                 MKLog("NetWork Error!, the \(request)'s network is unReachable.")

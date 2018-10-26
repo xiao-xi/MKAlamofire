@@ -9,14 +9,22 @@
 import Foundation
 import ObjectMapper
 import RealmSwift
+import Alamofire
 
-typealias completeJSONHandler<O: Mappable> = (_: MKBaseRequest, _:O?) -> Void
-
-typealias completeJSONArrayHandler<O: Mappable> = (_: MKBaseRequest, _:[O]?) -> Void
-
-typealias completeFailedHandler = (_: MKBaseRequest, _:MKErrorModel?) -> Void
+enum DataType {
+    case JSON
+    case JSONArray
+    case Default
+}
 
 class MKApiRequest: MKBaseRequest {
+    typealias successCompletionHandler<T: MKModel> = (_:T? ,_:[T]?) -> Void
+    
+    typealias failedModelCompletionHandler = (_:MKErrorModel) -> Void
+    
+    typealias successJSONCompletionHandler<T: MKModel> = (_:MKBaseRequest, _:T?) -> Void
+    typealias successArrayCompletionHandler<T: MKModel> = (_:MKBaseRequest, _:[T]?) -> Void
+    typealias failedCompletionHandler = (_:MKBaseRequest, _:MKErrorModel?) -> Void
     
     // 设置接口是否需要realm存储数据，默认为false
     var needRealm: Bool {
@@ -24,6 +32,10 @@ class MKApiRequest: MKBaseRequest {
     }
     
     var netParams: [String: Any]?
+    
+    var dataKey: String{
+        return "data"
+    }
     
     override var requestParams: [String : Any]?{
         return self.netParams
@@ -58,79 +70,100 @@ class MKApiRequest: MKBaseRequest {
         return headerDic
     }
     
-    /* get response JsonData,
-        - Parameters:
-        - responseClass: Class.self
-        - finishSuccessHandler: block success
-        - finishFailedHandler: block failed
-     */
-    typealias ModelSS = Mappable
-//    <C1:Container,C2:Container where C1.itemType == C2.itemType,C1.itemType:Equatable>
-    func getJsonDataWithCompletionHandler<T: ModelSS>(_ responseClass:T.Type,success finishSuccessHandler:@escaping completeJSONHandler<T>, failed finishFailedHandler:@escaping completeFailedHandler) -> Void {
-        //start request with proprety of self
-        self.start({ (successRequest) in
+    public func startWithJSONResponse<T: MKModel>(_ responseType:T.Type, success successHandler:@escaping successJSONCompletionHandler<T>, failed failedHandler: @escaping failedCompletionHandler) -> Void{
+        self.startWithCompletion(.JSON, success: { (jsonModel, jsonArray) in
+            successHandler(self, jsonModel)
+        }) { (errModel) in
+            failedHandler(self, errModel)
+        }
+    }
+    
+    public func startWithJSONArrayResponse<T: MKModel>(_ responseType:T.Type, success successHandler:@escaping successArrayCompletionHandler<T>, failed failedHandler: @escaping failedCompletionHandler) -> Void{
+        self.startWithCompletion(.JSONArray, success: { (jsonModel, jsonArray) in
+            successHandler(self, jsonArray)
+        }) { (errModel) in
+            failedHandler(self, errModel)
+        }
+    }
+    
+    public func startWithCompletion<T: MKModel>(_ responseType: DataType,success successHandler:@escaping successCompletionHandler<T>, failed failedHandler: @escaping failedModelCompletionHandler) -> Void{
+        self.start({ (request) in
             
-            guard (successRequest.responseJson != nil) else{
+            var jsonData : Any?
+            var errModel : MKErrorModel?
+            switch request.statusCode{
+            case 200:
+                //网络请求成功了,根据data路径找到需要的数据
+                jsonData = self.getJSONData(request)
+                break
+            default:
+                //网络请求失败了
+                errModel = self.getErrInfo(request)
+                failedHandler(errModel!)
+                break
+            }
+            
+            if errModel != nil{
                 return
             }
-    
-            if let data = successRequest.responseJson {
-                //
-//                MKAgent.shared.cancel(<#T##request: MKBaseRequest##MKBaseRequest#>)
-//                MKAgent.shared.cancelAllRequest()
-//                var isRefreshToken: Bool = false
-//                guard
-//                if data["error_code"] ==
-                //Refresh
+            //根据responseType进行处理数据
+            switch responseType{
+            case .JSON:
+                let jsonModel = self.getJSONModel(jsonData as! [String: Any], T.self)
+                successHandler(jsonModel, nil)
+                break
+            case .JSONArray:
+                let jsonArrayModel = self.getJSONArrayModel(jsonData as! [[String: Any]], T.self)
+                successHandler(nil, jsonArrayModel)
+                break
+            case .Default:
                 
-                let resJson = Mapper<T>().map(JSON: data["data"] as! [String : Any])
-                
-                if self.needRealm{
-                    self.writeRealm(resJson!)
-                }
-//                self.statusCode
-                finishSuccessHandler(self, resJson)
+                break
             }
-        }) { (failedRequest) in
-            if let data = failedRequest.responseJson {
-                let errModel = Mapper<MKErrorModel>().map(JSON: data)
-                finishFailedHandler(self, errModel)
-            }else{
-                finishFailedHandler(self, nil)
-            }
-        }
-    }
-    
-    /* get response JsonArray,
-     - Parameters:
-     - responseClass: Class.self
-     - finishHandler: block success
-     - finishFailedHandler: block failed
-     */
-    func getJsonArrayDataWithCompletionHandler<T: Mappable>(_ responseClass:T.Type,success finishSuccessHandler:@escaping completeJSONArrayHandler<T>, failed finishFailedHandler:@escaping completeFailedHandler) -> Void{
-        self.start({ (baseRequest) in
-            //这里返回的数据应该取出data字段中的数据转化为jsonString
-            //再使用Mapper<T>().mapArray(JSONfile: jsonString)方法转化为数组
-            //最后进行回调
-            let resJsonArray = Mapper<T>().mapArray(JSONString: "")
             
-            finishSuccessHandler(self, resJsonArray)
-        }) { (baseRequest) in
-            finishFailedHandler(self, nil)
+        }) { (request) in
+            //将request.error中的信息处理到ErrorModel中
+//            request.error
+            let errModel = MKErrorModel()
+            errModel.error = request.error
+            failedHandler(errModel)
         }
     }
     
-    /// 写入realm数据库(write to realm db)
-    ///
-    /// - Parameter model: 需要写入的数据模型
-    private func writeRealm<T:ModelSS>(_ model:T) -> Void {
-        // Get the default Realm
-        let realm = try! Realm()
+    //通过self.dataKey ，request.responseJson 获取json数据并返回
+    private func getJSONData(_ request: MKBaseRequest) -> [String: Any]?{
         
-        // Persist your data easily
-        try! realm.write {
-//            realm.add(model!)
-        }
-        
+//        return request.responseJson![self.dataKey] as? [String : Any]
+        return request.responseJson
+    }
+    
+    //通过request.responseJson获取网络请求失败后服务器返回错误信息
+    private func getErrInfo(_ request: MKBaseRequest) -> MKErrorModel?{
+        let errModel = Mapper<MKErrorModel>().map(JSON: request.responseJson!)
+        errModel?.error = request.error
+        return errModel
+    }
+    
+    //将json数据转化为模型
+    private func getJSONModel<T: Mappable>(_ json: [String: Any], _ modelType:T.Type) -> T?{
+        let jsonModel = Mapper<T>().map(JSON: json)
+        return jsonModel
+    }
+    
+    //将json数据转化模型数组
+    private func getJSONArrayModel<T: Mappable>(_ jsonArray: [[String : Any]], _ modelType:T.Type) -> [T]?{
+        let jsonArrayModel = Mapper<T>().mapArray(JSONArray: jsonArray)
+        return jsonArrayModel
+    }
+    
+    //将模型写入数据库，并把从数据库读出的此模型返回
+    private func writeJSONToRealm<T: Mappable>(_ jsonModel: T) -> T{
+        //这里进行存取
+        return jsonModel
+    }
+    //将模型数组写入数据库，并把从数据库读出的此模型数组返回
+    private func writeJSONArrayToRealm<T: Mappable>(_ jsonArrModel: [T]) -> [T]?{
+        //这里进行存取
+        return jsonArrModel
     }
 }

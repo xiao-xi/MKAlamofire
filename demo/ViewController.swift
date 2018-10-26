@@ -24,13 +24,6 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         print("view did load")
-        //account
-//        self.startAccountKitApi()
-        //chainrequest
-//        self.startChainRequest()
-        //batchrequest
-//        self.startBatchRequest()
-//        self.startSingleRequest()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -56,7 +49,7 @@ class ViewController: UIViewController {
         self.startRelyRequest()
     }
     @IBAction func testRequest(_ sender: UIButton) {
-        
+        self.testWaitApi()
     }
     
     //MARK: - Api handler
@@ -84,14 +77,13 @@ class ViewController: UIViewController {
             self.appendTextLog("batch failed")
         }
         
-        accountApi.getJsonDataWithCompletionHandler(UserModel.self, success: { (api, model) in
+        accountApi.startWithJSONResponse(MKModel.self, success: { (api, model) in
             print("Api success")
             self.appendTextLog("Api success")
             batchRequest.start()
         }) { (api, err) in
-            
-        }
         
+        }
     }
     
     func startBatchRequest() {
@@ -146,6 +138,8 @@ class ViewController: UIViewController {
         
         //batch start with batchFinish, singleSuccess and singleFailed
         batchRequest.start(finish: { (batch) in
+            print(batch.successRequests)
+            print(batch.failedRequests)
             self.appendTextLog("batch finish")
         }, singleSuccess: { (singleApi) in
             print("singleRequest success\(singleApi.requestURL)")
@@ -166,8 +160,7 @@ class ViewController: UIViewController {
     
         let accountChainApi = accountKitApi()
         let registerChainApi = RegisterApi.init("sss", "sss")
-//        chainRequest.add(accountChainApi)
-        
+
         chainRequest.add(accountChainApi) { (chain, account) in
             print("chainRequest 1 block")
             self.appendTextLog("chainRequest 1 block, requestUrl :\(account.requestURL)")
@@ -205,19 +198,52 @@ class ViewController: UIViewController {
         print("Authorization value: \(String(describing: value))")
     }
     
+    func testWaitApi() {
+        let refreshToken = RefreshApi()
+        MKAgent.shared.wait(for: refreshToken, Tag: 100)
+    
+        refreshToken.startWithJSONResponse(MKModel.self, success: { (api, res) in
+            print("request success,requestUrl :\(api.requestURL)")
+            DispatchQueue.main.asyncAfter(deadline: .now()+5, execute:
+                {
+                    MKAgent.shared.resumWaitRequests()
+            })
+        }) { (api, errModel) in
+            print("request failed,requestUrl :\(api.requestURL)")
+            MKAgent.shared.cancelAllWaitRequest()
+        }
+        
+        self.startAccountKitApi()
+        self.startBatchRequest()
+        self.startChainRequest()
+    }
+    
     func startAccountKitApi() {
         self.accountApi = accountKitApi()
-//        self.accountApi?.getJsonDataWithCompletionHandler(UserModel.self, success: { (api, res) in
-//            print("request success")
-//        }, failed: { (api, errModel) in
-//            print("request failed")
-//        })
+        self.accountApi?.set({ (progress) in
+            print(progress)
+        })
+        
+        self.accountApi?.startWithJSONResponse(MKModel.self, success: { (api, res) in
+            print("request success,requestUrl :\(api.requestURL)")
+        }, failed: { (api, errModel) in
+            print("request failed,requestUrl :\(api.requestURL)")
+        })
+        
+        self.accountApi?.startWithJSONResponse(MKModel.self, success: { (api, modelArr) in
+            
+        }, failed: { (api, errModel) in
+            
+        })
     }
     
     private func appendTextLog(_ textLog: String!){
-//        var oldLog: String? = self.logTextView.text
-//        oldLog?.append(textLog)
         self.logTextView.text.append("\n \(String(describing: textLog))")
+        let contentHeight = self.logTextView.contentSize.height
+        let boundHeight = self.logTextView.bounds.size.height
+        if contentHeight > boundHeight{
+            self.logTextView.setContentOffset(CGPoint.init(x: 0, y: contentHeight - boundHeight), animated: true)
+        }
     }
     
 }

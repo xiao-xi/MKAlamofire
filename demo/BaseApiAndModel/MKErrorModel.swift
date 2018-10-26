@@ -33,6 +33,8 @@ class MKErrorModel: MKModel {
     
     var error_type: MKErrorType?
     
+    var error: Error?
+    
     override func mapping(map: Map) {
         timestamp <- map["timestamp"]
         error_message <- map["error_message"]
