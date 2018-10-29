@@ -10,6 +10,7 @@ import UIKit
 import Alamofire
 import ObjectMapper
 import Foundation
+import RealmSwift
 
 class ViewController: UIViewController {
 
@@ -200,22 +201,27 @@ class ViewController: UIViewController {
     
     func testWaitApi() {
         let refreshToken = RefreshApi()
-        MKAgent.shared.wait(for: refreshToken, Tag: 100)
+//        MKAgent.shared.wait(for: refreshToken, Tag: 100)
     
-        refreshToken.startWithJSONResponse(MKModel.self, success: { (api, res) in
+        refreshToken.startWithJSONResponse(RefreshTokenModel.self, success: { (api, res) in
+            
+            let realm = try! Realm()
+            try! realm.write{
+                res?.access_token = "23tq928u5nakgn"
+            }
             print("request success,requestUrl :\(api.requestURL)")
-            DispatchQueue.main.asyncAfter(deadline: .now()+5, execute:
-                {
-                    MKAgent.shared.resumWaitRequests()
-            })
+//            DispatchQueue.main.asyncAfter(deadline: .now()+5, execute:
+//                {
+//                    MKAgent.shared.resumWaitRequests()
+//            })
         }) { (api, errModel) in
             print("request failed,requestUrl :\(api.requestURL)")
-            MKAgent.shared.cancelAllWaitRequest()
+//            MKAgent.shared.cancelAllWaitRequest()
         }
         
-        self.startAccountKitApi()
-        self.startBatchRequest()
-        self.startChainRequest()
+//        self.startAccountKitApi()
+//        self.startBatchRequest()
+//        self.startChainRequest()
     }
     
     func startAccountKitApi() {
@@ -224,16 +230,10 @@ class ViewController: UIViewController {
             print(progress)
         })
         
-        self.accountApi?.startWithJSONResponse(MKModel.self, success: { (api, res) in
+        self.accountApi?.startWithJSONResponse(UserModel.self, success: { (api, res) in
             print("request success,requestUrl :\(api.requestURL)")
         }, failed: { (api, errModel) in
             print("request failed,requestUrl :\(api.requestURL)")
-        })
-        
-        self.accountApi?.startWithJSONResponse(MKModel.self, success: { (api, modelArr) in
-            
-        }, failed: { (api, errModel) in
-            
         })
     }
     

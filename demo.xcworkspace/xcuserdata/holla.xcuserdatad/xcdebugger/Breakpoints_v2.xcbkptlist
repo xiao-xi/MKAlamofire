@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "demo/Source/MKAgent.swift"
-            timestampString = "562242710.780418"
+            timestampString = "562486998.886348"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "686"
-            endingLineNumber = "686"
+            startingLineNumber = "715"
+            endingLineNumber = "715"
             landmarkName = "removeRecord(forRequest:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -26,13 +26,21 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "demo/Source/MKAgent.swift"
-            timestampString = "562242710.780849"
+            timestampString = "562486998.88726"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "678"
-            endingLineNumber = "678"
+            startingLineNumber = "707"
+            endingLineNumber = "707"
             landmarkName = "addRecord(_:)"
             landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.SwiftErrorBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

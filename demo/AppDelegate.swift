@@ -52,6 +52,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //        MKConfig.shared.cdnURL = ""
         MKConfig.shared.acceptType = ["application/vnd.api+json", "application/json"]
         MKConfig.shared.urlFilters = [UrlFilter()]
+        MKConfig.shared.debugLogEnable = true
 ////        MKConfig.shared.downFileName = ""
 //        MKConfig.shared.listenNetWork = true
 //        MKConfig.shared.allowsCellularAccess = true

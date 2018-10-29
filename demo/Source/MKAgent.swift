@@ -39,20 +39,42 @@ public final class MKAgent {
     
     // MARK: - wait
     private var isWaiting: Bool = false
+    
+    //被延迟请求的网络请求对象数组
     private var _waitingRequests:[MKBaseRequest]
+    
+    //需要等待结束的网络请求的tag
     private var _waitingTag: Int = 0
     
+    //添加请求到被延迟请求的数组中
+    private func addWaitingRequest(_ request:MKBaseRequest){
+        _waitingRequests.append(request)
+    }
+    
+    /// 等待本次网络请求结束，才能继续之后的网络请求
+    /// 一个`wait`必须对应一个`resum`或者`cancel`
+    /// - Parameters:
+    ///   - request: 本次网络请求
+    ///   - tag: 本次网络请求的tag：必传且 > 0
     public func wait(for request:MKBaseRequest, Tag tag:Int){
+        //如果已经为true，说明有未处理完的wait操作
+        if self.isWaiting {
+            MKLog("已经存在一个等待的网络请求了，本次wait操作无效，请查看是否有未处理的wait操作")
+            return
+        }
+        
         self.isWaiting = true
         _waitingTag = tag
         request.tag = tag
     }
     
-    private func addWaitingRequest(_ request:MKBaseRequest){
-        _waitingRequests.append(request)
-    }
-    
+    /// 本次请求结束之后调用，继续请求被拦截下来的请求对象
     public func resumWaitRequests(){
+        if !self.isWaiting {
+            MKLog("wait操作已经结束，无法使用此方法!");
+            return
+        }
+        
         self.isWaiting = false
         _waitingTag = 0
         _waitingRequests.forEach { (request) in
@@ -61,13 +83,20 @@ public final class MKAgent {
         _waitingRequests.removeAll()
     }
     
+    /* 本次请求结束之后调用，
+     被缓存的请求对象数组依赖本次请求
+     若本次请求失败可以调用此方法释放所有被拦截的请求对象
+     */
     public func cancelAllWaitRequest() {
-        //因为被拦截的request并没有被添加到record中，所以不需要cancel这些request
+        if !self.isWaiting {
+            MKLog("wait操作已经结束，无法使用此方法!");
+            return
+        }
+        //因为被拦截的request并没有真正被添加到record中，所以不需要cancel这些request
         self.isWaiting = false
         _waitingTag = 0
         _waitingRequests.removeAll()
     }
-    
     
 // MARK: - Init and Reqest
     

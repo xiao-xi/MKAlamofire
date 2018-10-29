@@ -212,3 +212,11 @@ public func MKLog<T>(_ message:T, file File:NSString = #file, method Method:Stri
         #endif
     }
 }
+
+public func MKLog(_ message:String) -> Void {
+    if MKConfig.shared.debugLogEnable {
+        #if DEBUG
+        print(message)
+        #endif
+    }
+}

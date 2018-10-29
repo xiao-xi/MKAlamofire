@@ -47,7 +47,7 @@ class LoginApi: MKApiRequest {
 
 class accountKitApi: MKApiRequest {
     
-    override var needRealm: Bool{
+    override var realm: Bool{
         return true
     }
     
@@ -56,7 +56,7 @@ class accountKitApi: MKApiRequest {
     }
     
     override var requestParams: [String : Any]?{
-        return ["accountkit_token": "EMAWcG5IBrNptROARO97amymmaLtQFZCVQFVRL24TyJXWlKkXEcVGXWFsQmvTMFuhTuM1xIw7i2sUHGbhFZBGtiZCs9i0w4fwZB5oyFv8DnwZDZD"]
+        return ["accountkit_token": "EMAWfCmBTEmoU3rDSa7JFo5enuqmJs86wdZCKH53bfFXxwZASvpJZAc2h4jGhipZC9SFPzSXGpOyqCfKZCTLE38dUNlJsox3CI8gdBbHEgXoQZDZD"]
     }
     
     override var requestMethod: MKHTTPMethod{
@@ -69,6 +69,15 @@ class accountKitApi: MKApiRequest {
 }
 
 class RefreshApi: MKApiRequest {
+    
+    override var realm: Bool{
+        return true
+    }
+    
+    override func dataKey() -> String? {
+        return nil
+    }
+    
     override var requestURL: String{
         return "v2/auth/refresh"
     }
@@ -93,10 +102,6 @@ class RefreshApi: MKApiRequest {
     
     override var paramEncoding: MKParameterEncoding{
         return MKParameterEncoding.json
-    }
-    
-    override func dataKey() -> String? {
-        return nil
     }
 }
 
