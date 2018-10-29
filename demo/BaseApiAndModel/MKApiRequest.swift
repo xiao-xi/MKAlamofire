@@ -79,6 +79,9 @@ class MKApiRequest: MKBaseRequest {
         return headerDic
     }
     
+    private var requestSuccessHandler: successCompletionHandler<MKModel>?
+    private var requestFailedHandler: failedModelCompletionHandler?
+    
     //进行会返回模型对象的网络请求
     public func startWithJSONResponse<T: MKModel>(_ responseType:T.Type, success successHandler:@escaping successJSONCompletionHandler<T>, failed failedHandler: @escaping failedCompletionHandler) -> Void{
         self.startWithCompletion(.JSON, success: { (jsonModel, jsonArray) in
@@ -99,52 +102,55 @@ class MKApiRequest: MKBaseRequest {
     
     //根据参数类型返回数据模型或模型数组
     private func startWithCompletion<T: MKModel>(_ responseType: DataType,success successHandler:@escaping successCompletionHandler<T>, failed failedHandler: @escaping failedModelCompletionHandler) -> Void{
+        self.requestSuccessHandler = successHandler as? MKApiRequest.successCompletionHandler<MKModel>
+        self.requestFailedHandler = failedHandler
         self.start({ (request) in
-            var jsonData : Any?
-            var errModel : MKErrorModel?
-            switch request.statusCode{
-            case 200:
-                //网络请求成功了,根据data路径找到需要的数据
-                jsonData = self.getJSONData(request)
-                break
-            default:
-                //网络请求失败了
-                errModel = self.getErrInfo(request)
-                break
-            }
-            
-            //jsondata转化失败
-            if (jsonData == nil) {
-                failedHandler(MKErrorModel("no jsonData!"))
-                return
-            }
-            
-            //网络失败
-            if errModel != nil {
-                failedHandler(errModel)
-                return
-            }
-            //根据responseType进行处理数据
-            switch responseType{
-            case .JSON:
-                guard let jsonModel = self.getJSONModel(jsonData as! [String: Any], T.self) else{
-                    failedHandler(MKErrorModel("no jsonModel!"))
+            DispatchQueue.realmCurrent.async {
+                var jsonData : Any?
+                var errModel : MKErrorModel?
+                switch request.statusCode{
+                case 200:
+                    //网络请求成功了,根据data路径找到需要的数据
+                    jsonData = self.getJSONData(request)
+                    break
+                default:
+                    //网络请求失败了
+                    errModel = self.getErrInfo(request)
+                    break
+                }
+                
+                //jsondata转化失败
+                if (jsonData == nil) {
+                    self.requestFailed(MKErrorModel("no jsonData!"))
                     return
                 }
-                successHandler(jsonModel, nil)
-                break
-            case .JSONArray:
-                guard let jsonArrayModel = self.getJSONArrayModel(jsonData as! [[String: Any]], T.self) else{
-                    failedHandler(MKErrorModel("no jsonArrayModel!"))
+                
+                //网络失败
+                if errModel != nil {
+                    self.requestFailed(errModel)
                     return
                 }
-                successHandler(nil, jsonArrayModel)
-                break
-            case .Default:
-                MKLog("no used")
-                break
+                //根据responseType进行处理数据
+                switch responseType{
+                case .JSON:
+                    guard let jsonModel = self.getJSONModel(jsonData as! [String: Any], T.self) else{
+                        self.requestFailed(MKErrorModel("no jsonModel!"))
+                        return
+                    }
+                    self.requestSuccess(jsonModel, nil)
+                    break
+                case .JSONArray:
+                    guard let jsonArrayModel = self.getJSONArrayModel(jsonData as! [[String: Any]], T.self) else{
+                        self.requestFailed(MKErrorModel("no jsonArrayModel!"))
+                        return
+                    }
+                    self.requestSuccess(nil, jsonArrayModel)
+                    break
+                case .Default:
+                    MKLog("no used")
+                    break
+                }
             }
-            
         }) { (request) in
             //将request.error中的信息处理到ErrorModel中
             let errModel = MKErrorModel("request error!")
@@ -204,5 +210,30 @@ class MKApiRequest: MKBaseRequest {
         }
 
         return jsonArrayModel
+    }
+    
+    private func requestFailed(_ err:MKErrorModel?) -> Void{
+        if !Thread.isMainThread {
+            DispatchQueue.main.async {
+                self.requestFailedHandler?(err)
+                self.requestFailedHandler = nil
+            }
+        }else {
+            self.requestFailedHandler?(err)
+            self.requestFailedHandler = nil
+        }
+    }
+    
+    private func requestSuccess<T: MKModel>(_ jsonModel: T?, _ jsonArrayModel: [T]?) -> Void{
+        if !Thread.isMainThread {
+            DispatchQueue.main.async {
+                self.requestSuccessHandler?(jsonModel, jsonArrayModel)
+                self.requestSuccessHandler = nil
+            }
+        }else {
+            self.requestSuccessHandler?(jsonModel, jsonArrayModel)
+            self.requestSuccessHandler = nil
+        }
+        
     }
 }

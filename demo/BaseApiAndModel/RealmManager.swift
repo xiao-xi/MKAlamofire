@@ -39,7 +39,7 @@ class RealmManager: NSObject {
             return nil
         }
         //查询数据库是否存在jsonModel
-        print("jsonModel:\(jsonModel)")
+//        print("jsonModel:\(jsonModel)")
         //        var
         //        print("primaryKey:\(jsonModel.value(forKey: primaryKey))")
         guard let realmObject = realm.object(ofType: T.self, forPrimaryKey: jsonModel.value(forKey: primaryKey)) else {
@@ -50,7 +50,7 @@ class RealmManager: NSObject {
             return realm.object(ofType: T.self, forPrimaryKey: jsonModel.value(forKey: primaryKey))
         }
         
-        MKLog("realmObject: \(realmObject)")
+//        MKLog("realmObject: \(realmObject)")
         //如果存在，从数据库中取出这个对象，将jsonModel的各项值赋值给它，再将它写入数据库
         //不使用update方法的原因是存储的对象有可能包含responseJson不具备的属性，update方法会导致这些属性被删除
         guard let properties = T.sharedSchema()?.properties else{
