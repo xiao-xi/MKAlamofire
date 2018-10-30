@@ -339,7 +339,14 @@ public final class MKAgent {
     private func setNetworkActivityIndicatorVisible(_ show: Bool = true) {
         // in iOS, show and hide the network status.
         #if os(iOS)
+        if Thread.isMainThread {
             UIApplication.shared.isNetworkActivityIndicatorVisible = show
+        }else{
+            DispatchQueue.main.async {
+                UIApplication.shared.isNetworkActivityIndicatorVisible = show
+            }
+        }
+        
         #endif
     }
     

@@ -237,7 +237,7 @@ class ViewController: UIViewController {
         })
     }
     
-    private func appendTextLog(_ textLog: String!){
+    fileprivate func appendTextLog(_ textLog: String!){
         self.logTextView.text.append("\n \(String(describing: textLog))")
         let contentHeight = self.logTextView.contentSize.height
         let boundHeight = self.logTextView.bounds.size.height

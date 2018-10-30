@@ -27,9 +27,6 @@ enum MKErrorType : String {
 
 //ErrorModel 属性与请求失败后返回的字段进行匹配
 class MKErrorModel: MKModel {
-    
-    
-    
     //时间戳
     var timestamp: String?
     
@@ -51,6 +48,10 @@ class MKErrorModel: MKModel {
     required convenience init(_ message:String?) {
         self.init()
         self.error_message = message
+    }
+    
+    override class func ignoredProperties() -> [String] {
+        return ["error_type","error"]
     }
     
     //Map

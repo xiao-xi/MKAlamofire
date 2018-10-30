@@ -41,9 +41,9 @@ public final class MKChainRequest {
 /// @name Private Properties
 ///=============================================================================
 
-    private let _emptyCallBack: MKChainRequestClosure
-    private var _requestCallBacks: [MKChainRequestClosure]
-    private var _nextRequestIndex: Int
+    private let emptyCallBack: MKChainRequestClosure
+    fileprivate var requestCallBacks: [MKChainRequestClosure]
+    fileprivate var nextRequestIndex: Int
     public private(set) var rawString: String
     
 // MARK: - Cycle Life
@@ -53,10 +53,10 @@ public final class MKChainRequest {
 ///=============================================================================
     
     public init() {
-        _nextRequestIndex = 0
+        nextRequestIndex = 0
         requests = [MKBaseRequest]()
-        _requestCallBacks = [MKChainRequestClosure]()
-        _emptyCallBack = { _, _ in }
+        requestCallBacks = [MKChainRequestClosure]()
+        emptyCallBack = { _, _ in }
         rawString = UUID().uuidString
     }
     
@@ -68,7 +68,7 @@ public final class MKChainRequest {
     
     ///  Start the chain request, adding first request in the chain to request queue.
     public func start() {
-        if _nextRequestIndex > 0 {
+        if nextRequestIndex > 0 {
             MKLog("Chain Error! Chain request has already started!")
             return
         }
@@ -100,9 +100,9 @@ public final class MKChainRequest {
     public func add(_ request:MKBaseRequest, callBack closure: MKChainRequestClosure? = nil) {
         requests.append(request)
         if let closure = closure {
-            _requestCallBacks.append(closure)
+            requestCallBacks.append(closure)
         }else{
-            _requestCallBacks.append(_emptyCallBack)
+            requestCallBacks.append(emptyCallBack)
         }
     }
     
@@ -120,10 +120,10 @@ public final class MKChainRequest {
 /// @name Private
 ///=============================================================================
     
-    @discardableResult private func startNextRequest() -> Bool {
-        if _nextRequestIndex < requests.count {
-            let request = requests[_nextRequestIndex]
-            _nextRequestIndex += 1
+    @discardableResult fileprivate func startNextRequest() -> Bool {
+        if nextRequestIndex < requests.count {
+            let request = requests[nextRequestIndex]
+            nextRequestIndex += 1
             request.delegate = self
             request.clearCompleteClosure()
             request.start()
@@ -133,13 +133,13 @@ public final class MKChainRequest {
     }
     
     private func cleanRequest() -> Void {
-        let currentIndex = _nextRequestIndex - 1
+        let currentIndex = nextRequestIndex - 1
         if currentIndex <  requests.count {
             let request = requests[currentIndex]
             request.stop()
         }
         requests.removeAll()
-        _requestCallBacks.removeAll()
+        requestCallBacks.removeAll()
     }
 }
 
@@ -180,8 +180,8 @@ extension MKChainRequest {
 extension MKChainRequest : MKRequestProtocol {
     
     public func requestFinish(_ request: MKBaseRequest) {
-        let currentIndex = _nextRequestIndex - 1
-        let closure = _requestCallBacks[currentIndex]
+        let currentIndex = nextRequestIndex - 1
+        let closure = requestCallBacks[currentIndex]
         closure(self, request)
         if !self.startNextRequest() {
             self.totalAccessoriesWillStop()
