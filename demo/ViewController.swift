@@ -207,7 +207,7 @@ class ViewController: UIViewController {
             
             let realm = try! Realm()
             try! realm.write{
-                res?.access_token = "23tq928u5nakgn"
+                res?.access_token = "111111"
             }
             print("request success,requestUrl :\(api.requestURL)")
 //            DispatchQueue.main.asyncAfter(deadline: .now()+5, execute:

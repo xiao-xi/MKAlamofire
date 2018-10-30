@@ -68,7 +68,7 @@ class RealmManager: NSObject {
                 realmObject.setValue(newValue, forKey: property.name)
             })
         }
-        return realmObject
+        return realm.object(ofType: T.self, forPrimaryKey: jsonModel.value(forKey: primaryKey))
     }
 }
 

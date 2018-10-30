@@ -10,6 +10,7 @@ import Foundation
 import ObjectMapper
 import RealmSwift
 import Alamofire
+import Realm
 
 //与后台约定返回数据的处理格式
 //目前提供了json与jsonArray
@@ -22,6 +23,8 @@ private enum DataType {
 }
 
 class MKApiRequest: MKBaseRequest {
+    
+    //MARK: - alias block
     typealias successCompletionHandler<T: MKModel> = (_:T? ,_:[T]?) -> Void
     
     typealias failedModelCompletionHandler = (_:MKErrorModel?) -> Void
@@ -30,6 +33,7 @@ class MKApiRequest: MKBaseRequest {
     typealias successArrayCompletionHandler<T: MKModel> = (_:MKBaseRequest, _:[T]?) -> Void
     typealias failedCompletionHandler = (_:MKBaseRequest, _:MKErrorModel?) -> Void
     
+    //MARK: - custom params
     // 设置接口是否需要realm存储数据，默认为false
     var realm: Bool {
         return false
@@ -45,7 +49,16 @@ class MKApiRequest: MKBaseRequest {
         return "data"
     }
     
+    // requestHandler
+    private var requestFailedHandler: failedModelCompletionHandler?
+    //
+    //    func requestSuccessHandler <T: MKModel> (_: T?,_:[T]?) -> Void{}
+    //
+    //    func failed (_:MKErrorModel?) -> Void{}
+    
+    //MARK: - override params
     //重写`requestParams`设置请求参数为`netParams`
+    //使用中可以只
     override var requestParams: [String : Any]?{
         return self.netParams
     }
@@ -79,9 +92,8 @@ class MKApiRequest: MKBaseRequest {
         return headerDic
     }
     
-    private var requestSuccessHandler: successCompletionHandler<MKModel>?
-    private var requestFailedHandler: failedModelCompletionHandler?
     
+    //MARK: - Public Method
     //进行会返回模型对象的网络请求
     public func startWithJSONResponse<T: MKModel>(_ responseType:T.Type, success successHandler:@escaping successJSONCompletionHandler<T>, failed failedHandler: @escaping failedCompletionHandler) -> Void{
         self.startWithCompletion(.JSON, success: { (jsonModel, jsonArray) in
@@ -100,12 +112,12 @@ class MKApiRequest: MKBaseRequest {
         }
     }
     
+    //MARK: - Private Method
     //根据参数类型返回数据模型或模型数组
     private func startWithCompletion<T: MKModel>(_ responseType: DataType,success successHandler:@escaping successCompletionHandler<T>, failed failedHandler: @escaping failedModelCompletionHandler) -> Void{
-        self.requestSuccessHandler = successHandler as? MKApiRequest.successCompletionHandler<MKModel>
         self.requestFailedHandler = failedHandler
         self.start({ (request) in
-            DispatchQueue.realmCurrent.async {
+            DispatchQueue.global().async {
                 var jsonData : Any?
                 var errModel : MKErrorModel?
                 switch request.statusCode{
@@ -130,6 +142,7 @@ class MKApiRequest: MKBaseRequest {
                     self.requestFailed(errModel)
                     return
                 }
+                
                 //根据responseType进行处理数据
                 switch responseType{
                 case .JSON:
@@ -137,14 +150,48 @@ class MKApiRequest: MKBaseRequest {
                         self.requestFailed(MKErrorModel("no jsonModel!"))
                         return
                     }
-                    self.requestSuccess(jsonModel, nil)
+                    if self.realm{
+                        let safeRef = ThreadSafeReference(to: jsonModel)
+                        
+                        DispatchQueue.main.async {
+                            let realm = try? Realm()
+                            let safeObject = realm?.resolve(safeRef)
+                            successHandler(safeObject, nil)
+                        }
+                    }else{
+                        DispatchQueue.main.async {
+                            successHandler(jsonModel, nil)
+                        }
+                    }
+                    
                     break
                 case .JSONArray:
                     guard let jsonArrayModel = self.getJSONArrayModel(jsonData as! [[String: Any]], T.self) else{
                         self.requestFailed(MKErrorModel("no jsonArrayModel!"))
                         return
                     }
-                    self.requestSuccess(nil, jsonArrayModel)
+                    
+                    if self.realm {
+                        let references = jsonArrayModel.map({
+                            ThreadSafeReference(to: $0)
+                        })
+                        
+                        DispatchQueue.main.async {
+                            let realm = try? Realm()
+                            var safeObjects = [T]()
+                            references.forEach({ (reference) in
+                                if let safeObject = realm?.resolve(reference){
+                                    safeObjects.append(safeObject)
+                                }
+                            })
+                            successHandler(nil, safeObjects)
+                        }
+                    }else{
+                        DispatchQueue.main.async {
+                            successHandler(nil, jsonArrayModel)
+                        }
+                    }
+                    
                     break
                 case .Default:
                     MKLog("no used")
@@ -225,15 +272,15 @@ class MKApiRequest: MKBaseRequest {
     }
     
     private func requestSuccess<T: MKModel>(_ jsonModel: T?, _ jsonArrayModel: [T]?) -> Void{
-        if !Thread.isMainThread {
-            DispatchQueue.main.async {
-                self.requestSuccessHandler?(jsonModel, jsonArrayModel)
-                self.requestSuccessHandler = nil
-            }
-        }else {
-            self.requestSuccessHandler?(jsonModel, jsonArrayModel)
-            self.requestSuccessHandler = nil
-        }
+//        if !Thread.isMainThread {
+//            DispatchQueue.main.async {
+//                self.requestSuccessHandler?(jsonModel, jsonArrayModel)
+//                self.requestSuccessHandler = nil
+//            }
+//        }else {
+//            self.requestSuccessHandler?(jsonModel, jsonArrayModel)
+//            self.requestSuccessHandler = nil
+//        }
         
     }
 }
