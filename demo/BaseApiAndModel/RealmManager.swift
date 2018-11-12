@@ -29,38 +29,38 @@ class RealmManager: NSObject {
         return realmObjects
     }
     
+    
+    /// 把模型对象写入realm数据库
+    ///
+    /// - Parameter jsonModel: 模型对象
+    /// - Returns: 从realm数据库取出模型对象
     static func writeJSONToRealm<T: MKModel>(_ jsonModel: T) -> T?{
         //打开数据库
         let realm = try! Realm()
         print(realm.configuration.fileURL!)
         guard let primaryKey = T.primaryKey() else {
-            //没有主键            //
+            //没有主键
             MKLog("no primaryKey, All subclasses of MKModel must have a primary key!")
             return nil
         }
         //查询数据库是否存在jsonModel
-//        print("jsonModel:\(jsonModel)")
-        //        var
-        //        print("primaryKey:\(jsonModel.value(forKey: primaryKey))")
         guard let realmObject = realm.object(ofType: T.self, forPrimaryKey: jsonModel.value(forKey: primaryKey)) else {
             try! realm.write {
                 realm.add(jsonModel) // 增加单个数据
             }
-            //            return realmObject
+            //return realmObject
             return realm.object(ofType: T.self, forPrimaryKey: jsonModel.value(forKey: primaryKey))
         }
         
-//        MKLog("realmObject: \(realmObject)")
         //如果存在，从数据库中取出这个对象，将jsonModel的各项值赋值给它，再将它写入数据库
         //不使用update方法的原因是存储的对象有可能包含responseJson不具备的属性，update方法会导致这些属性被删除
         guard let properties = T.sharedSchema()?.properties else{
-            //没有属性
             return nil
         }
         
         try! realm.write {
             properties.forEach({ (property) in
-                //主键是不是property，必须过滤主键
+                //主键是不是property，必须过滤主键，主键不可以更改
                 if property.name == primaryKey{
                     return
                 }
@@ -69,12 +69,5 @@ class RealmManager: NSObject {
             })
         }
         return realm.object(ofType: T.self, forPrimaryKey: jsonModel.value(forKey: primaryKey))
-    }
-}
-
-extension DispatchQueue {
-    public static var realmCurrent: DispatchQueue {
-        let name = String(format: "com.MKRealm.manager.%08x%08x", arc4random(),arc4random())
-        return DispatchQueue(label: name, attributes: .concurrent)
     }
 }

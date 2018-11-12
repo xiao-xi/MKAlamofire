@@ -44,21 +44,18 @@ class MKApiRequest: MKBaseRequest {
     
     //response数据存放的key，默认为data字段中的数据
     //有的返回数据不在此字段中，可以重写后返回nil
-    //考虑传入形如"data.user.friends"的字符串使用更深层级的数据（未实现）
-    func dataKey() -> String? {
+    //可传入形如"data.user.friends"的路径使用更深层级的数据
+    //注意此路径里的内容必须为字典内容[String: Any]
+    var dataKey: String?{
         return "data"
     }
     
     // requestHandler
     private var requestFailedHandler: failedModelCompletionHandler?
-    //
-    //    func requestSuccessHandler <T: MKModel> (_: T?,_:[T]?) -> Void{}
-    //
-    //    func failed (_:MKErrorModel?) -> Void{}
     
     //MARK: - override params
     //重写`requestParams`设置请求参数为`netParams`
-    //使用中可以只
+    //使用中设置netParamsj即可
     override var requestParams: [String : Any]?{
         return self.netParams
     }
@@ -73,7 +70,7 @@ class MKApiRequest: MKBaseRequest {
         return MKParameterEncoding.url
     }
     
-    //设置httpheaders
+    //设置自定义的httpheaders
     override var requestHeaders: MKHTTPHeaders?{
         let client = Environment.bundleId
         let version = Environment.appVersion
@@ -86,15 +83,22 @@ class MKApiRequest: MKBaseRequest {
         ]
         //判断是否有Authorization
         if Environment.authorization != nil {
-            headerDic["authorization"] = "Authorization value"
+            headerDic["authorization"] = Environment.authorization
             return headerDic
         }
+        
         return headerDic
     }
     
     
     //MARK: - Public Method
-    //进行会返回模型对象的网络请求
+
+    /// 进行会返回模型对象的网络请求
+    ///
+    /// - Parameters:
+    ///   - responseType: 期望的出参类型，用于接收返回数据
+    ///   - successHandler: 请求成功的回调
+    ///   - failedHandler: 请求失败e的回调
     public func startWithJSONResponse<T: MKModel>(_ responseType:T.Type, success successHandler:@escaping successJSONCompletionHandler<T>, failed failedHandler: @escaping failedCompletionHandler) -> Void{
         self.startWithCompletion(.JSON, success: { (jsonModel, jsonArray) in
             successHandler(self, jsonModel)
@@ -102,8 +106,13 @@ class MKApiRequest: MKBaseRequest {
             failedHandler(self, errModel)
         }
     }
-    
-    //进行会返回模型对象数组的网络请求
+
+    /// 进行会返回模型对象数组的网络请求
+    ///
+    /// - Parameters:
+    ///   - responseType: 期望的出参类型，用于接收返回数据
+    ///   - successHandler: 请求成功的回调
+    ///   - failedHandler: 请求失败e的回调
     public func startWithJSONArrayResponse<T: MKModel>(_ responseType:T.Type, success successHandler:@escaping successArrayCompletionHandler<T>, failed failedHandler: @escaping failedCompletionHandler) -> Void{
         self.startWithCompletion(.JSONArray, success: { (jsonModel, jsonArray) in
             successHandler(self, jsonArray)
@@ -113,7 +122,13 @@ class MKApiRequest: MKBaseRequest {
     }
     
     //MARK: - Private Method
-    //根据参数类型返回数据模型或模型数组
+
+    /// 根据参数类型返回数据模型或模型数组
+    ///
+    /// - Parameters:
+    ///   - responseType: 期望的出参类型，用于接收返回数据
+    ///   - successHandler: 请求成功的回调
+    ///   - failedHandler: 请求失败e的回调
     private func startWithCompletion<T: MKModel>(_ responseType: DataType,success successHandler:@escaping successCompletionHandler<T>, failed failedHandler: @escaping failedModelCompletionHandler) -> Void{
         self.requestFailedHandler = failedHandler
         self.start({ (request) in
@@ -146,7 +161,8 @@ class MKApiRequest: MKBaseRequest {
                 //根据responseType进行处理数据
                 switch responseType{
                 case .JSON:
-                    guard let jsonModel = self.getJSONModel(jsonData as! [String: Any], T.self) else{
+                    //判断jsonData的类型------
+                    guard let json = jsonData as? [String : Any] ,let jsonModel = self.getJSONModel(json, T.self) else{
                         self.requestFailed(MKErrorModel("no jsonModel!"))
                         return
                     }
@@ -166,7 +182,8 @@ class MKApiRequest: MKBaseRequest {
                     
                     break
                 case .JSONArray:
-                    guard let jsonArrayModel = self.getJSONArrayModel(jsonData as! [[String: Any]], T.self) else{
+                    //判断jsonData的类型-----
+                    guard let json = jsonData as? [[String : Any]] , let jsonArrayModel = self.getJSONArrayModel(json, T.self) else{
                         self.requestFailed(MKErrorModel("no jsonArrayModel!"))
                         return
                     }
@@ -194,7 +211,7 @@ class MKApiRequest: MKBaseRequest {
                     
                     break
                 case .Default:
-                    MKLog("no used")
+                    MKLog("no used responseType")
                     break
                 }
             }
@@ -206,33 +223,41 @@ class MKApiRequest: MKBaseRequest {
         }
     }
     
-    //通过self.dataKey ，request.responseJson 获取json数据并返回
-    private func getJSONData(_ request: MKBaseRequest) -> [String: Any]?{
-        guard let key = self.dataKey() else {
+    /// 通过self.dataKey ，request.responseJson 获取json数据并返回
+    ///
+    /// - Parameter request: request
+    /// - Returns: [String: Any] or [[String: Any]] or nil
+    private func getJSONData(_ request: MKBaseRequest) -> Any?{
+        guard let key = self.dataKey else {
             return request.responseJson
         }
         //解析key
-        if key.contains(Character.init(".")){
-            let keys = key.components(separatedBy: ".")
-            
-            return nil
-        }else {
-            return request.responseJson?[key] as? [String : Any]
+        if key.contains(Character.init(".")){//keyPath
+            return request.responseJson?[keyPath: KeyPath.init(key)]
+        }else {//key
+            return request.responseJson?[key]
         }
     }
-    
-    //通过request.responseJson获取网络请求失败后服务器返回错误信息
+
+    /// 通过request.responseJson获取网络请求失败后服务器返回错误信息
+    ///
+    /// - Parameter request: request
+    /// - Returns: ErroModel
     private func getErrInfo(_ request: MKBaseRequest) -> MKErrorModel?{
-        guard let json = request.responseJson else{
+        guard let json = request.responseJson, let errModel = Mapper<MKErrorModel>().map(JSON: json) else{
             return MKErrorModel("no responseJson!")
         }
         
-        let errModel = Mapper<MKErrorModel>().map(JSON: json)
-        errModel?.error = request.error
+        errModel.error = request.error
         return errModel
     }
-    
-    //将json数据转化为模型
+
+    /// 将json数据转化为模型
+    ///
+    /// - Parameters:
+    ///   - json: 输入的json数据
+    ///   - modelType: 模型的类型
+    /// - Returns: 模型对象
     private func getJSONModel<T: MKModel>(_ json: [String: Any], _ modelType:T.Type) -> T?{
         guard let jsonModel = Mapper<T>().map(JSON: json) else {
             return nil
@@ -244,7 +269,12 @@ class MKApiRequest: MKBaseRequest {
         return jsonModel
     }
     
-    //将json数据转化模型数组
+    /// 将json数据转化模型数组
+    ///
+    /// - Parameters:
+    ///   - jsonArray: 输入的jsonArray数据
+    ///   - modelType: 模型的类型
+    /// - Returns: 模型对象的数组
     private func getJSONArrayModel<T: MKModel>(_ jsonArray: [[String : Any]], _ modelType:T.Type) -> [T]?{
         let jsonArrayModel = Mapper<T>().mapArray(JSONArray: jsonArray)
 
@@ -259,6 +289,10 @@ class MKApiRequest: MKBaseRequest {
         return jsonArrayModel
     }
     
+    
+    /// 请求失败的统一处理
+    ///
+    /// - Parameter err: errModel
     private func requestFailed(_ err:MKErrorModel?) -> Void{
         if !Thread.isMainThread {
             DispatchQueue.main.async {
@@ -271,6 +305,12 @@ class MKApiRequest: MKBaseRequest {
         }
     }
     
+    
+    /// 请求成功的统一处理，因为`self.requestSuccessHandler`未能成功声明为变量，（未实现 ）
+    ///
+    /// - Parameters:
+    ///   - jsonModel: 模型对象
+    ///   - jsonArrayModel: 模型对象数组
     private func requestSuccess<T: MKModel>(_ jsonModel: T?, _ jsonArrayModel: [T]?) -> Void{
 //        if !Thread.isMainThread {
 //            DispatchQueue.main.async {

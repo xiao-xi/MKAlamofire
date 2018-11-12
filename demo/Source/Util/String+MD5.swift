@@ -29,8 +29,8 @@ public struct _StringProxy {
 }
 
 extension String {
-    public typealias CompatibleType = _StringProxy
-    public var MK: CompatibleType {
+    public typealias StringProxyType = _StringProxy
+    public var MK: StringProxyType {
         return _StringProxy(proxy: self)
     }
 }

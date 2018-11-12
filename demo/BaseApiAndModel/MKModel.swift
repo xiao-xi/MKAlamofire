@@ -23,28 +23,14 @@ class MKModel:Object, Mappable{
     func mapping(map: Map) {
         
     }
+    //重写此方法设置主键
+//    override static func primaryKey() -> String? {
+//        return ""
+//    }
     
     //重写此方法可以忽略不合规则的属性
 //    override class func ignoredProperties() -> [String] {
-//        return ["attributes", "relationships", "deep_link"]
-//    }
-    
-//    //将json数据转化为模型
-//    static private func getJSONModel<T: MKModel>(_ json: [String: Any], _ modelType:T.Type) -> T?{
-//        guard let jsonModel = Mapper<T>().map(JSON: json) else {
-//            return nil
-//        }
-//        return jsonModel
-//    }
-//    
-//    //将json数据转化模型数组
-//    static private func getJSONArrayModel<T: MKModel>(_ jsonArray: [[String : Any]], _ modelType:T.Type) -> [T]?{
-//        let jsonArrayModel = Mapper<T>().mapArray(JSONArray: jsonArray)
-//        
-//        if jsonArrayModel.count == 0 {
-//            return nil
-//        }
-//        return jsonArrayModel
+//        return []
 //    }
 }
 

@@ -235,6 +235,17 @@ class ViewController: UIViewController {
         }, failed: { (api, errModel) in
             print("request failed,requestUrl :\(api.requestURL)")
         })
+        
+        self.startGetMyFriends()
+    }
+    
+    func startGetMyFriends() {
+        let friendsApi = FriendShipsApi()
+        friendsApi.startWithJSONArrayResponse(FriendModel.self, success: { (api, friends) in
+            
+        }) { (api, errModel) in
+            
+        }
     }
     
     fileprivate func appendTextLog(_ textLog: String!){

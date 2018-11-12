@@ -12,11 +12,7 @@ import ObjectMapper
 
 class UserModel: MKModel {
     @objc dynamic var user_id: String?
-    
-    override static func primaryKey() -> String? {
-        return "user_id"
-    }
-    
+
     @objc dynamic var action: String?
     
     @objc dynamic var type: String?
@@ -26,6 +22,11 @@ class UserModel: MKModel {
     @objc dynamic var relationships: [String: Any]?
     
     @objc dynamic var deep_link: [String: Any]?
+    
+    
+    override static func primaryKey() -> String? {
+        return "user_id"
+    }
     
     override class func ignoredProperties() -> [String] {
         return ["attributes", "relationships", "deep_link"]
